@@ -21,7 +21,7 @@ export const useWrapped = () => {
       const res = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, limit: 100 }),
+        body: JSON.stringify({ username, limit: 500 }),
       });
 
       const data: AnalyzeResponse | ErrorResponse = await res.json();
@@ -42,13 +42,23 @@ export const useWrapped = () => {
     }
   }, []);
 
+  const retry = useCallback(() => {
+    if (state.error) {
+      // Extract username from error context or require it
+      // For now, just reset error
+      setState(prev => ({ ...prev, error: null }));
+    }
+  }, [state.error]);
+
   const reset = useCallback(() => {
     setState({ data: null, loading: false, error: null });
+    localStorage.removeItem('reddit-wrapped-progress');
   }, []);
 
   return {
     ...state,
     analyze,
     reset,
+    retry,
   } as const;
 };

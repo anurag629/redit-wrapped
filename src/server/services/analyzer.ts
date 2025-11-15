@@ -58,6 +58,7 @@ function analyzeActivityPattern(
 ): ActivityPattern {
   const hourOfDay = new Array(24).fill(0);
   const dayOfWeek = new Array(7).fill(0);
+  const seasonalActivity = new Array(4).fill(0);
   const monthlyMap = new Map<string, number>();
 
   // Process posts
@@ -65,6 +66,10 @@ function analyzeActivityPattern(
     const date = new Date(post.created_utc * 1000);
     hourOfDay[date.getUTCHours()]++;
     dayOfWeek[date.getUTCDay()]++;
+
+    const month = date.getUTCMonth();
+    const season = Math.floor(month / 3); // 0: Dec-Feb, 1: Mar-May, 2: Jun-Aug, 3: Sep-Nov
+    seasonalActivity[season]++;
 
     const monthKey = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}`;
     monthlyMap.set(monthKey, (monthlyMap.get(monthKey) || 0) + 1);
@@ -76,6 +81,10 @@ function analyzeActivityPattern(
     hourOfDay[date.getUTCHours()]++;
     dayOfWeek[date.getUTCDay()]++;
 
+    const month = date.getUTCMonth();
+    const season = Math.floor(month / 3);
+    seasonalActivity[season]++;
+
     const monthKey = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}`;
     monthlyMap.set(monthKey, (monthlyMap.get(monthKey) || 0) + 1);
   }
@@ -86,7 +95,7 @@ function analyzeActivityPattern(
     .sort((a, b) => a.month.localeCompare(b.month))
     .slice(-12); // Last 12 months
 
-  return { hourOfDay, dayOfWeek, monthlyActivity };
+  return { hourOfDay, dayOfWeek, monthlyActivity, seasonalActivity };
 }
 
 /**
@@ -341,6 +350,10 @@ export function analyzeUserData(
 
   const accountAge = Math.floor((Date.now() / 1000 - profile.created_utc) / (365 * 24 * 60 * 60));
 
+  const mostActiveSeason = activityPattern.seasonalActivity.indexOf(
+    Math.max(...activityPattern.seasonalActivity)
+  );
+
   return {
     totalPosts: posts.length,
     totalComments: comments.length,
@@ -357,5 +370,6 @@ export function analyzeUserData(
     avgCommentScore: Math.round(avgCommentScore),
     mostActiveHour,
     mostActiveDay,
+    mostActiveSeason,
   };
 }

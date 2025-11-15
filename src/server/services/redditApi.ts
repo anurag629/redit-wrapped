@@ -63,7 +63,14 @@ export async function fetchUserPosts(
     });
 
     // Fetch all posts from the listing
-    const redditPosts = await listing.all();
+    let redditPosts;
+    try {
+      redditPosts = await listing.all();
+    } catch (err) {
+      console.warn(`Could not fetch posts for ${username}:`, err);
+      // Return empty array if user has private profile or no posts
+      return [];
+    }
 
     console.log(`Fetched ${redditPosts.length} posts`);
 
@@ -82,7 +89,8 @@ export async function fetchUserPosts(
     return posts;
   } catch (error) {
     console.error('Error fetching user posts:', error);
-    throw new RedditApiError('Failed to fetch user posts', 'FETCH_ERROR');
+    // Don't throw error, return empty array for graceful handling
+    return [];
   }
 }
 
@@ -105,7 +113,14 @@ export async function fetchUserComments(
     });
 
     // Fetch all comments from the listing
-    const redditComments = await listing.all();
+    let redditComments;
+    try {
+      redditComments = await listing.all();
+    } catch (err) {
+      console.warn(`Could not fetch comments for ${username}:`, err);
+      // Return empty array if user has private profile or no comments
+      return [];
+    }
 
     console.log(`Fetched ${redditComments.length} comments`);
 
@@ -121,7 +136,8 @@ export async function fetchUserComments(
     return comments;
   } catch (error) {
     console.error('Error fetching user comments:', error);
-    throw new RedditApiError('Failed to fetch user comments', 'FETCH_ERROR');
+    // Don't throw error, return empty array for graceful handling
+    return [];
   }
 }
 

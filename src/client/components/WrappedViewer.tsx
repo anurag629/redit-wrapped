@@ -20,8 +20,42 @@ interface WrappedViewerProps {
 }
 
 export const WrappedViewer = ({ username, stats, onReset }: WrappedViewerProps) => {
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [currentSlide, setCurrentSlide] = useState(() => {
+    const saved = localStorage.getItem('reddit-wrapped-progress');
+    return saved ? parseInt(saved) : 0;
+  });
   const [transitioning, setTransitioning] = useState(false);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  // Save progress
+  useEffect(() => {
+    localStorage.setItem('reddit-wrapped-progress', currentSlide.toString());
+  }, [currentSlide]);
+
+  // Minimum swipe distance
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches?.[0]?.clientX || null);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => setTouchEnd(e.targetTouches?.[0]?.clientX || null);
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe && currentSlide < slides.length - 1) {
+      nextSlide();
+    }
+    if (isRightSwipe && currentSlide > 0) {
+      prevSlide();
+    }
+  };
 
   const slides = [
     <WelcomeSlide key="welcome" username={username} />,
@@ -72,7 +106,13 @@ export const WrappedViewer = ({ username, stats, onReset }: WrappedViewerProps) 
       className="relative w-full h-screen overflow-hidden bg-black select-none"
       onClick={nextSlide}
       onKeyDown={handleKeyDown}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
       tabIndex={0}
+      role="application"
+      aria-label="Reddit Wrapped Slideshow"
+      aria-live="polite"
     >
       {/* Current Slide with fade transition */}
       <div
@@ -100,7 +140,7 @@ export const WrappedViewer = ({ username, stats, onReset }: WrappedViewerProps) 
       </div>
 
       {/* Navigation Buttons */}
-      <div className="absolute bottom-8 left-0 right-0 flex justify-center gap-4 px-4 z-20">
+      <div className="absolute bottom-20 left-0 right-0 flex justify-center gap-4 px-4 z-20">
         {currentSlide > 0 && (
           <button
             onClick={(e) => {
@@ -108,6 +148,7 @@ export const WrappedViewer = ({ username, stats, onReset }: WrappedViewerProps) 
               prevSlide();
             }}
             className="bg-white/20 backdrop-blur-lg hover:bg-white/30 text-white px-8 py-4 rounded-full font-bold transition-all transform hover:scale-105 active:scale-95 shadow-xl border border-white/30"
+            aria-label="Go to previous slide"
           >
             ← Previous
           </button>
@@ -119,6 +160,7 @@ export const WrappedViewer = ({ username, stats, onReset }: WrappedViewerProps) 
               onReset();
             }}
             className="bg-white hover:bg-white/90 text-orange-600 px-10 py-4 rounded-full font-black text-lg transition-all transform hover:scale-105 active:scale-95 shadow-2xl"
+            aria-label="Start over with a new analysis"
           >
             ✨ Start Over
           </button>
@@ -129,6 +171,7 @@ export const WrappedViewer = ({ username, stats, onReset }: WrappedViewerProps) 
               nextSlide();
             }}
             className="bg-white/20 backdrop-blur-lg hover:bg-white/30 text-white px-8 py-4 rounded-full font-bold transition-all transform hover:scale-105 active:scale-95 shadow-xl border border-white/30"
+            aria-label="Go to next slide"
           >
             Next →
           </button>
@@ -136,7 +179,7 @@ export const WrappedViewer = ({ username, stats, onReset }: WrappedViewerProps) 
       </div>
 
       {/* Slide Counter */}
-      <div className="absolute bottom-8 right-8 text-white/60 text-sm font-bold z-20 pointer-events-none bg-black/20 backdrop-blur px-4 py-2 rounded-full">
+      <div className="absolute bottom-4 right-4 text-white/60 text-sm font-bold z-20 pointer-events-none bg-black/20 backdrop-blur px-4 py-2 rounded-full" aria-label={`Slide ${currentSlide + 1} of ${slides.length}`}>
         {currentSlide + 1} / {slides.length}
       </div>
 

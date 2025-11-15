@@ -132,3 +132,28 @@
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.5);
 }
+
+/* Focus indicators */
+button:focus-visible,
+input:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid #ff6b35;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .bg-white\/20 {
+    background-color: rgba(255, 255, 255, 0.4);
+  }
+  .text-white\/90 {
+    color: rgba(255, 255, 255, 0.95);
+  }
+}
+
+/* Slide content padding to avoid button overlap */
+.slide-content {
+  padding-bottom: 10rem; /* Extra space for bottom buttons */
+  max-height: 100vh;
+  overflow-y: auto;
+}

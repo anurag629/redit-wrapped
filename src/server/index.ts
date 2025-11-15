@@ -138,7 +138,7 @@ router.post<unknown, AnalyzeResponse | ErrorResponse, AnalyzeRequest>(
   '/api/analyze',
   async (req, res): Promise<void> => {
     try {
-      const { username, limit = 100 } = req.body;
+      const { username, limit = 500 } = req.body;
 
       if (!username || typeof username !== 'string') {
         res.status(400).json({
@@ -174,7 +174,18 @@ router.post<unknown, AnalyzeResponse | ErrorResponse, AnalyzeRequest>(
       console.log(`Fetching data for user: ${cleanUsername}`);
 
       // Fetch Reddit data
-      const { profile, posts, comments } = await fetchCompleteUserData(reddit, cleanUsername, limit);
+      const { profile, posts, comments } = await fetchCompleteUserData(reddit as any, cleanUsername, limit);
+
+      // Check if we have any data
+      if (posts.length === 0 && comments.length === 0) {
+        console.warn(`No data available for user: ${cleanUsername}`);
+        res.status(404).json({
+          type: 'error',
+          message: 'No public posts or comments found for this user. The profile may be private, suspended, or have no activity.',
+          code: 'NO_DATA_AVAILABLE',
+        });
+        return;
+      }
 
       // Analyze data
       const stats = analyzeUserData(profile, posts, comments);

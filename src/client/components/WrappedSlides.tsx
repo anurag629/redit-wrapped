@@ -33,7 +33,7 @@ export const WelcomeSlide = ({ username }: { username: string }) => (
 
 // Slide 2: Account Overview
 export const AccountOverviewSlide = ({ stats }: SlideProps) => (
-  <div className="flex flex-col items-center justify-center h-full gap-8 p-8 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 text-white">
+  <div className="flex flex-col items-center justify-center h-full gap-8 p-8 pb-32 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 text-white overflow-y-auto">
     <h2 className="text-4xl font-black animate-slide-down">Your Reddit Journey</h2>
     <div className="flex flex-col gap-6 w-full max-w-md">
       <div className="bg-white/20 backdrop-blur-xl rounded-3xl p-8 transform hover:scale-105 transition-all duration-300 border border-white/30 shadow-2xl animate-slide-up">
@@ -73,10 +73,10 @@ export const AccountOverviewSlide = ({ stats }: SlideProps) => (
 // Slide 3: Activity Stats
 export const ActivityStatsSlide = ({ stats }: SlideProps) => {
   const totalActivity = stats.totalPosts + stats.totalComments;
-  const postPercentage = (stats.totalPosts / totalActivity) * 100;
+  const postPercentage = totalActivity > 0 ? (stats.totalPosts / totalActivity) * 100 : 50;
 
   return (
-    <div className="flex flex-col items-center justify-center h-full gap-6 p-8 bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 text-white">
+    <div className="flex flex-col items-center justify-center h-full gap-6 p-8 pb-32 bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 text-white overflow-y-auto">
       <h2 className="text-4xl font-black animate-slide-down">You've Been Busy!</h2>
 
       {/* Total activity */}
@@ -93,31 +93,37 @@ export const ActivityStatsSlide = ({ stats }: SlideProps) => {
           <div className="text-4xl mb-2">📝</div>
           <AnimatedNumber value={stats.totalPosts} className="text-4xl font-black block" />
           <div className="text-sm opacity-90 mt-1">posts</div>
-          <div className="text-xs opacity-75 mt-1">avg {stats.avgPostScore} karma</div>
+          {stats.totalPosts > 0 && (
+            <div className="text-xs opacity-75 mt-1">avg {stats.avgPostScore} karma</div>
+          )}
         </div>
         <div className="bg-white/20 backdrop-blur-xl rounded-2xl p-6 text-center transform hover:scale-105 transition-all border border-white/30 shadow-xl">
           <div className="text-4xl mb-2">💬</div>
           <AnimatedNumber value={stats.totalComments} className="text-4xl font-black block" />
           <div className="text-sm opacity-90 mt-1">comments</div>
-          <div className="text-xs opacity-75 mt-1">avg {stats.avgCommentScore} karma</div>
+          {stats.totalComments > 0 && (
+            <div className="text-xs opacity-75 mt-1">avg {stats.avgCommentScore} karma</div>
+          )}
         </div>
       </div>
 
       {/* Activity breakdown bar */}
-      <div className="w-full max-w-md">
-        <div className="bg-white/10 rounded-full h-8 overflow-hidden border border-white/30">
-          <div
-            className="bg-gradient-to-r from-yellow-400 to-orange-400 h-full flex items-center justify-center font-bold text-sm transition-all duration-1000"
-            style={{ width: `${postPercentage}%` }}
-          >
-            {postPercentage > 20 && `${Math.round(postPercentage)}%`}
+      {totalActivity > 0 && (
+        <div className="w-full max-w-md">
+          <div className="bg-white/10 rounded-full h-8 overflow-hidden border border-white/30">
+            <div
+              className="bg-gradient-to-r from-yellow-400 to-orange-400 h-full flex items-center justify-center font-bold text-sm transition-all duration-1000"
+              style={{ width: `${postPercentage}%` }}
+            >
+              {postPercentage > 20 && `${Math.round(postPercentage)}%`}
+            </div>
+          </div>
+          <div className="flex justify-between mt-2 text-xs opacity-75">
+            <span>Posts</span>
+            <span>Comments</span>
           </div>
         </div>
-        <div className="flex justify-between mt-2 text-xs opacity-75">
-          <span>Posts</span>
-          <span>Comments</span>
-        </div>
-      </div>
+      )}
     </div>
   );
 };
@@ -127,7 +133,7 @@ export const TopSubredditsSlide = ({ stats }: SlideProps) => {
   const maxScore = Math.max(...stats.topSubreddits.map((s) => s.totalScore));
 
   return (
-    <div className="flex flex-col items-center justify-center h-full gap-6 p-8 bg-gradient-to-br from-pink-600 via-rose-600 to-red-600 text-white">
+    <div className="flex flex-col items-center justify-center h-full gap-6 p-8 pb-32 bg-gradient-to-br from-pink-600 via-rose-600 to-red-600 text-white overflow-y-auto">
       <div className="text-center">
         <div className="text-5xl mb-3">🏆</div>
         <h2 className="text-4xl font-black">Your Favorite Communities</h2>
@@ -173,7 +179,7 @@ export const TopSubredditsSlide = ({ stats }: SlideProps) => {
 
 // Slide 5: Personality
 export const PersonalitySlide = ({ stats }: SlideProps) => (
-  <div className="flex flex-col items-center justify-center h-full gap-8 p-8 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-white">
+  <div className="flex flex-col items-center justify-center h-full gap-8 p-8 pb-32 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-white overflow-y-auto">
     <h2 className="text-4xl font-black">You Are...</h2>
     <div className="bg-white/20 backdrop-blur-xl rounded-3xl p-12 border border-white/30 shadow-2xl transform hover:scale-105 transition-all">
       <div className="text-7xl font-black text-center animate-pulse-slow">{stats.insights.personality}</div>
@@ -206,7 +212,7 @@ export const PersonalitySlide = ({ stats }: SlideProps) => (
 
 // Slide 6: Badges
 export const BadgesSlide = ({ stats }: SlideProps) => (
-  <div className="flex flex-col items-center justify-center h-full gap-6 p-8 bg-gradient-to-br from-yellow-500 via-orange-500 to-red-500 text-white">
+  <div className="flex flex-col items-center justify-center h-full gap-6 p-8 pb-32 bg-gradient-to-br from-yellow-500 via-orange-500 to-red-500 text-white overflow-y-auto">
     <div className="text-center">
       <div className="text-6xl mb-3 animate-bounce">🎖️</div>
       <h2 className="text-4xl font-black">Your Achievements</h2>
@@ -234,7 +240,7 @@ export const BadgesSlide = ({ stats }: SlideProps) => (
 
 // Slide 7: Top Post
 export const TopPostSlide = ({ stats }: SlideProps) => (
-  <div className="flex flex-col items-center justify-center h-full gap-6 p-8 bg-gradient-to-br from-red-600 via-pink-600 to-rose-600 text-white">
+  <div className="flex flex-col items-center justify-center h-full gap-6 p-8 pb-32 bg-gradient-to-br from-red-600 via-pink-600 to-rose-600 text-white overflow-y-auto">
     <div className="text-center">
       <div className="text-6xl mb-3">🔥</div>
       <h2 className="text-4xl font-black">Your Top Post</h2>
@@ -278,7 +284,7 @@ export const TopPostSlide = ({ stats }: SlideProps) => (
 
 // Slide 8: Top Comment
 export const TopCommentSlide = ({ stats }: SlideProps) => (
-  <div className="flex flex-col items-center justify-center h-full gap-6 p-8 bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-600 text-white">
+  <div className="flex flex-col items-center justify-center h-full gap-6 p-8 pb-32 bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-600 text-white overflow-y-auto">
     <div className="text-center">
       <div className="text-6xl mb-3">💎</div>
       <h2 className="text-4xl font-black">Your Top Comment</h2>
@@ -313,6 +319,7 @@ export const TopCommentSlide = ({ stats }: SlideProps) => (
 // Slide 9: Activity Time
 export const ActivityTimeSlide = ({ stats }: SlideProps) => {
   const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const seasons = ['Winter', 'Spring', 'Summer', 'Fall'];
   const hours = [
     '12am',
     '1am',
@@ -347,8 +354,13 @@ export const ActivityTimeSlide = ({ stats }: SlideProps) => {
     return '🌙';
   };
 
+  const getSeasonEmoji = (season: number) => {
+    const emojis = ['❄️', '🌸', '☀️', '🍂'];
+    return emojis[season] || '🌍';
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center h-full gap-6 p-8 bg-gradient-to-br from-cyan-600 via-blue-600 to-indigo-600 text-white">
+    <div className="flex flex-col items-center justify-center h-full gap-6 p-8 pb-32 bg-gradient-to-br from-cyan-600 via-blue-600 to-indigo-600 text-white overflow-y-auto">
       <div className="text-center">
         <div className="text-6xl mb-3">⏰</div>
         <h2 className="text-4xl font-black">When You're Most Active</h2>
@@ -379,33 +391,104 @@ export const ActivityTimeSlide = ({ stats }: SlideProps) => {
                   : 'Evening explorer! 🌆'}
           </div>
         </div>
+        <div className="text-center bg-white/10 rounded-2xl p-6">
+          <div className="text-sm opacity-75 mb-2">Most Active Season</div>
+          <div className="flex items-center justify-center gap-3">
+            <div className="text-5xl">{getSeasonEmoji(stats.mostActiveSeason)}</div>
+            <div className="text-5xl font-black">{seasons[stats.mostActiveSeason]}</div>
+          </div>
+          <div className="text-lg mt-2 opacity-90">
+            {stats.mostActiveSeason === 0
+              ? 'Winter wonderland! ❄️'
+              : stats.mostActiveSeason === 1
+                ? 'Spring into action! 🌸'
+                : stats.mostActiveSeason === 2
+                  ? 'Summer vibes! ☀️'
+                  : 'Fall feels! 🍂'}
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
 // Slide 10: Final Summary
-export const SummarySlide = ({ username }: { username: string }) => (
-  <div className="flex flex-col items-center justify-center h-full gap-8 p-8 bg-gradient-to-br from-orange-600 via-red-600 to-pink-600 text-white overflow-hidden relative">
-    {/* Animated background */}
-    <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-10">
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-white rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-white rounded-full blur-3xl animate-pulse delay-500" />
-    </div>
+export const SummarySlide = ({ username }: { username: string }) => {
+  const shareText = `Check out my Reddit Wrapped! I discovered some interesting insights about my Reddit activity. #RedditWrapped`;
+  const shareUrl = window.location.href;
 
-    <div className="relative z-10 text-center space-y-6">
-      <div className="text-8xl animate-bounce">🎊</div>
-      <h2 className="text-5xl font-black">That's Your Reddit Wrapped!</h2>
-      <div className="space-y-4">
-        <p className="text-2xl font-semibold">Thanks for being part of Reddit,</p>
-        <p className="text-4xl font-black">u/{username}!</p>
-        <p className="text-xl opacity-90">Here's to another great year ahead 🎉</p>
+  const shareOnTwitter = () => {
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+    window.open(url, '_blank');
+  };
+
+  const shareOnReddit = () => {
+    const url = `https://reddit.com/submit?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(`My Reddit Wrapped Results!`)}`;
+    window.open(url, '_blank');
+  };
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
+      alert('Link copied to clipboard!');
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+    }
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center h-full gap-8 p-8 bg-gradient-to-br from-orange-600 via-red-600 to-pink-600 text-white overflow-hidden relative">
+      {/* Animated background */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-10">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-white rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-white rounded-full blur-3xl animate-pulse delay-500" />
+      </div>
+
+      <div className="relative z-10 text-center space-y-6">
+        <div className="text-8xl animate-bounce">🎊</div>
+        <h2 className="text-5xl font-black">That's Your Reddit Wrapped!</h2>
+        <div className="space-y-4">
+          <p className="text-2xl font-semibold">Thanks for being part of Reddit,</p>
+          <p className="text-4xl font-black">u/{username}!</p>
+          <p className="text-xl opacity-90">Here's to another great year ahead 🎉</p>
+        </div>
+      </div>
+
+      {/* Share Section */}
+      <div className="relative z-10 bg-white/20 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-xl">
+        <div className="text-center mb-4">
+          <p className="text-lg font-bold">Share Your Results</p>
+          <p className="text-sm opacity-90">Let your friends see your Reddit story!</p>
+        </div>
+        <div className="flex gap-3 justify-center">
+          <button
+            onClick={shareOnTwitter}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-bold transition-all transform hover:scale-105 flex items-center gap-2"
+          >
+            <span>🐦</span>
+            Twitter
+          </button>
+          <button
+            onClick={shareOnReddit}
+            className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-bold transition-all transform hover:scale-105 flex items-center gap-2"
+          >
+            <span>🟠</span>
+            Reddit
+          </button>
+          <button
+            onClick={copyToClipboard}
+            className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-bold transition-all transform hover:scale-105 flex items-center gap-2"
+          >
+            <span>📋</span>
+            Copy Link
+          </button>
+        </div>
+      </div>
+
+      <div className="relative z-10 bg-white/20 backdrop-blur-xl rounded-2xl p-6 text-center border border-white/30">
+        <p className="text-sm opacity-90">Want to see another profile?</p>
+        <p className="text-lg font-bold mt-2">Tap "Start Over" below! 👇</p>
       </div>
     </div>
-
-    <div className="relative z-10 bg-white/20 backdrop-blur-xl rounded-2xl p-6 text-center border border-white/30">
-      <p className="text-sm opacity-90">Want to see another profile?</p>
-      <p className="text-lg font-bold mt-2">Tap "Start Over" below! 👇</p>
-    </div>
-  </div>
-);
+  );
+};

@@ -42,6 +42,7 @@ export interface ActivityPattern {
   hourOfDay: number[];
   dayOfWeek: number[];
   monthlyActivity: { month: string; count: number }[];
+  seasonalActivity: number[];
 }
 
 export interface UserInsights {
@@ -69,6 +70,7 @@ export interface WrappedStats {
   avgCommentScore: number;
   mostActiveHour: number;
   mostActiveDay: number;
+  mostActiveSeason: number;
 }
 
 export interface AnalyzeRequest {

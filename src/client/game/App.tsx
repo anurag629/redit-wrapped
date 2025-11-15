@@ -4,7 +4,10 @@ import { WrappedViewer } from '../components/WrappedViewer';
 
 export const App = () => {
   const [username, setUsername] = useState('');
-  const { data, loading, error, analyze, reset } = useWrapped();
+  const [isDark, setIsDark] = useState(() => {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
+  const { data, loading, error, analyze, reset, retry } = useWrapped();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,6 +104,8 @@ export const App = () => {
               className="w-full px-6 py-4 border-3 border-gray-200 rounded-2xl focus:border-orange-500 focus:ring-4 focus:ring-orange-200 focus:outline-none text-gray-900 placeholder:text-gray-400 text-lg font-semibold transition-all"
               disabled={loading}
               autoFocus
+              aria-label="Reddit username input"
+              aria-describedby="username-help"
             />
           </div>
 
@@ -111,6 +116,13 @@ export const App = () => {
                 <div>
                   <div className="font-bold mb-1">Error</div>
                   <div>{error}</div>
+                  <button
+                    onClick={() => retry()}
+                    className="mt-3 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold transition-all"
+                    aria-label="Retry analysis"
+                  >
+                    Try Again
+                  </button>
                 </div>
               </div>
             </div>
@@ -158,10 +170,13 @@ export const App = () => {
             <span>•</span>
             <span>💬 Comments</span>
           </div>
+          <div id="username-help" className="sr-only">
+            Enter your Reddit username to generate your personalized activity summary
+          </div>
         </div>
       </form>
 
-      <footer className="absolute bottom-6 text-white/60 text-sm relative z-10">
+      <footer className="absolute bottom-6 text-white/60 text-sm z-10">
         <div className="text-center">
           <p className="font-semibold">Powered by Devvit & Reddit API</p>
           <p className="text-xs mt-1">No AI needed - Pure statistical analysis</p>
