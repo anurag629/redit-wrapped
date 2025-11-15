@@ -217,21 +217,24 @@ function generateBadges(
 ): string[] {
   const badges: string[] = [];
 
-  // Account age badges
+  // Account age badges (cumulative - earn all that apply)
   const accountAgeYears = (Date.now() / 1000 - profile.created_utc) / (365 * 24 * 60 * 60);
   if (accountAgeYears >= 10) badges.push('Decade Club 🏆');
-  else if (accountAgeYears >= 5) badges.push('5 Year Club ⭐');
-  else if (accountAgeYears >= 1) badges.push('1 Year Club 🎂');
+  if (accountAgeYears >= 5) badges.push('5 Year Club ⭐');
+  if (accountAgeYears >= 1) badges.push('1 Year Club 🎂');
 
-  // Karma badges
+  // Karma badges (cumulative - earn all that apply)
   if (profile.total_karma >= 100000) badges.push('Karma Millionaire 💰');
-  else if (profile.total_karma >= 50000) badges.push('High Karma 📈');
-  else if (profile.total_karma >= 10000) badges.push('Rising Star ✨');
+  if (profile.total_karma >= 50000) badges.push('High Karma 📈');
+  if (profile.total_karma >= 10000) badges.push('Rising Star ✨');
+  if (profile.total_karma >= 1000) badges.push('Karma Achiever 🌟');
 
   // Activity time badges
   const mostActiveHour = activityPattern.hourOfDay.indexOf(Math.max(...activityPattern.hourOfDay));
   if (mostActiveHour >= 0 && mostActiveHour < 6) badges.push('Night Owl 🦉');
-  else if (mostActiveHour >= 6 && mostActiveHour < 12) badges.push('Early Bird 🌅');
+  if (mostActiveHour >= 6 && mostActiveHour < 12) badges.push('Early Bird 🌅');
+  if (mostActiveHour >= 12 && mostActiveHour < 18) badges.push('Afternoon Surfer ☀️');
+  if (mostActiveHour >= 18 && mostActiveHour < 24) badges.push('Evening Explorer 🌆');
 
   const weekendActivity =
     (activityPattern.dayOfWeek[0] || 0) + (activityPattern.dayOfWeek[6] || 0);
@@ -243,10 +246,32 @@ function generateBadges(
   // Engagement badges
   if (comments.length > posts.length * 5) badges.push('Conversation Starter 💬');
   if (posts.length > comments.length * 2) badges.push('Content Machine 📹');
+  if (comments.length >= 1000) badges.push('Comment Champion 💭');
+  if (posts.length >= 100) badges.push('Prolific Poster 📝');
+  if (comments.length >= 100 && posts.length >= 100) badges.push('All-Rounder 🎯');
 
   // Quality badges
   const avgPostScore = posts.reduce((sum, p) => sum + p.score, 0) / (posts.length || 1);
+  const avgCommentScore = comments.reduce((sum, c) => sum + c.score, 0) / (comments.length || 1);
   if (avgPostScore > 100) badges.push('Quality Poster 🎯');
+  if (avgCommentScore > 50) badges.push('Valued Commenter 💎');
+  
+  // Viral content badges
+  const topPost = posts.reduce((max, p) => (p.score > max.score ? p : max), posts[0] || { score: 0 });
+  const topComment = comments.reduce((max, c) => (c.score > max.score ? c : max), comments[0] || { score: 0 });
+  if (topPost && topPost.score > 1000) badges.push('Viral Post Creator 🚀');
+  if (topComment && topComment.score > 500) badges.push('Comment Legend 🏅');
+
+  // Community badges
+  const uniqueSubreddits = new Set([...posts.map(p => p.subreddit), ...comments.map(c => c.subreddit)]).size;
+  if (uniqueSubreddits >= 50) badges.push('Community Explorer 🗺️');
+  if (uniqueSubreddits >= 25) badges.push('Subreddit Hopper 🦘');
+  
+  // Activity volume badges
+  const totalActivity = posts.length + comments.length;
+  if (totalActivity >= 5000) badges.push('Super Active 🔥');
+  if (totalActivity >= 1000) badges.push('Very Active ⚡');
+  if (totalActivity >= 500) badges.push('Active Member 📊');
 
   // Gold badge
   if (profile.is_gold) badges.push('Reddit Premium 👑');

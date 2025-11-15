@@ -124,11 +124,11 @@ export const WrappedViewer = ({ username, stats, onReset }: WrappedViewerProps) 
       </div>
 
       {/* Progress Indicator */}
-      <div className="absolute top-4 left-0 right-0 flex gap-1 sm:gap-1.5 px-3 sm:px-4 z-20 pointer-events-none">
+      <div className="absolute top-4 md:top-6 lg:top-8 left-0 right-0 flex gap-1 sm:gap-1.5 md:gap-2 px-3 sm:px-4 md:px-6 lg:px-8 z-20 pointer-events-none">
         {slides.map((_, idx) => (
           <div
             key={idx}
-            className={`h-1 sm:h-1.5 flex-1 rounded-full transition-all duration-500 ${
+            className={`h-1 sm:h-1.5 md:h-2 lg:h-2.5 flex-1 rounded-full transition-all duration-500 ${
               idx === currentSlide
                 ? 'bg-white shadow-lg'
                 : idx < currentSlide
@@ -140,14 +140,14 @@ export const WrappedViewer = ({ username, stats, onReset }: WrappedViewerProps) 
       </div>
 
       {/* Navigation Buttons */}
-      <div className="absolute bottom-24 sm:bottom-28 left-0 right-0 flex justify-center gap-2 sm:gap-4 px-3 sm:px-4 z-20">
+      <div className="absolute bottom-24 sm:bottom-28 md:bottom-32 lg:bottom-36 left-0 right-0 flex justify-center gap-2 sm:gap-4 md:gap-6 lg:gap-8 px-3 sm:px-4 md:px-6 lg:px-8 z-20">
         {currentSlide > 0 && (
           <button
             onClick={(e) => {
               e.stopPropagation();
               prevSlide();
             }}
-            className="bg-white/20 backdrop-blur-lg hover:bg-white/30 text-white px-4 sm:px-8 py-2.5 sm:py-4 rounded-full text-sm sm:text-base font-bold transition-all transform hover:scale-105 active:scale-95 shadow-xl border border-white/30"
+            className="bg-white/20 backdrop-blur-lg hover:bg-white/30 text-white px-4 sm:px-8 md:px-10 lg:px-12 py-2.5 sm:py-4 md:py-4.5 lg:py-5 rounded-full text-sm sm:text-base md:text-lg lg:text-xl font-bold transition-all transform hover:scale-105 active:scale-95 shadow-xl border border-white/30"
             aria-label="Go to previous slide"
           >
             ← <span className="hidden sm:inline">Previous</span>
@@ -159,7 +159,7 @@ export const WrappedViewer = ({ username, stats, onReset }: WrappedViewerProps) 
               e.stopPropagation();
               onReset();
             }}
-            className="bg-white hover:bg-white/90 text-orange-600 px-6 sm:px-10 py-2.5 sm:py-4 rounded-full font-black text-base sm:text-lg transition-all transform hover:scale-105 active:scale-95 shadow-2xl"
+            className="bg-white hover:bg-white/90 text-orange-600 px-6 sm:px-10 md:px-12 lg:px-16 py-2.5 sm:py-4 md:py-4.5 lg:py-5 rounded-full font-black text-base sm:text-lg md:text-xl lg:text-2xl transition-all transform hover:scale-105 active:scale-95 shadow-2xl"
             aria-label="Start over with a new analysis"
           >
             ✨ Start Over
@@ -170,7 +170,7 @@ export const WrappedViewer = ({ username, stats, onReset }: WrappedViewerProps) 
               e.stopPropagation();
               nextSlide();
             }}
-            className="bg-white/20 backdrop-blur-lg hover:bg-white/30 text-white px-4 sm:px-8 py-2.5 sm:py-4 rounded-full text-sm sm:text-base font-bold transition-all transform hover:scale-105 active:scale-95 shadow-xl border border-white/30"
+            className="bg-white/20 backdrop-blur-lg hover:bg-white/30 text-white px-4 sm:px-8 md:px-10 lg:px-12 py-2.5 sm:py-4 md:py-4.5 lg:py-5 rounded-full text-sm sm:text-base md:text-lg lg:text-xl font-bold transition-all transform hover:scale-105 active:scale-95 shadow-xl border border-white/30"
             aria-label="Go to next slide"
           >
             <span className="hidden sm:inline">Next</span> →
@@ -179,13 +179,13 @@ export const WrappedViewer = ({ username, stats, onReset }: WrappedViewerProps) 
       </div>
 
       {/* Slide Counter */}
-      <div className="absolute bottom-4 sm:bottom-6 right-3 sm:right-4 text-white/60 text-xs sm:text-sm font-bold z-20 pointer-events-none bg-black/20 backdrop-blur px-3 sm:px-4 py-1.5 sm:py-2 rounded-full" aria-label={`Slide ${currentSlide + 1} of ${slides.length}`}>
+      <div className="absolute bottom-4 sm:bottom-6 md:bottom-8 lg:bottom-10 right-3 sm:right-4 md:right-6 lg:right-8 text-white/60 text-xs sm:text-sm md:text-base lg:text-lg font-bold z-20 pointer-events-none bg-black/20 backdrop-blur px-3 sm:px-4 md:px-5 lg:px-6 py-1.5 sm:py-2 md:py-2.5 lg:py-3 rounded-full" aria-label={`Slide ${currentSlide + 1} of ${slides.length}`}>
         {currentSlide + 1} / {slides.length}
       </div>
 
       {/* Click hint (only on first slide) */}
       {currentSlide === 0 && (
-        <div className="absolute bottom-36 sm:bottom-40 left-1/2 transform -translate-x-1/2 text-white/50 text-xs sm:text-sm animate-pulse pointer-events-none z-10">
+        <div className="absolute bottom-36 sm:bottom-40 md:bottom-44 lg:bottom-48 left-1/2 transform -translate-x-1/2 text-white/50 text-xs sm:text-sm md:text-base lg:text-lg animate-pulse pointer-events-none z-10">
           👆 Tap anywhere to continue
         </div>
       )}
