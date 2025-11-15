@@ -444,32 +444,85 @@ export const ActivityTimeSlide = ({ stats }: SlideProps) => {
 
 // Slide 10: Final Summary
 export const SummarySlide = ({ username }: { username: string }) => {
-  const shareText = `Check out my Reddit Wrapped! I discovered some interesting insights about my Reddit activity. #RedditWrapped`;
-  const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+  // For Devvit WebView, we need to construct a proper shareable URL
+  // The app should be shared via the Reddit post where it's installed
+  const getShareUrl = (): string => {
+    if (typeof window === 'undefined') return 'https://www.reddit.com/r/redit_wrapped_dev/';
+    
+    // Try to get the Reddit post URL from the current context
+    // In a Devvit WebView, window.location.href might not be useful
+    // So we'll create a generic shareable link
+    const currentUrl = window.location.href;
+    
+    // If we can detect a Reddit URL pattern, use it
+    if (currentUrl.includes('reddit.com')) {
+      // Extract the post URL if possible
+      const redditUrlMatch = currentUrl.match(/(https?:\/\/[^\/]*reddit\.com\/r\/[^\/]+\/comments\/[^\/]+\/[^\/]+)/);
+      if (redditUrlMatch && redditUrlMatch[1]) {
+        return redditUrlMatch[1];
+      }
+    }
+    
+    // Fallback: construct a general Reddit search or community URL
+    return 'https://www.reddit.com/r/redit_wrapped_dev/';
+  };
+
+  const shareUrl = getShareUrl();
 
   const shareOnTwitter = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+    
+    const tweetText = `🎉 Check out my #RedditWrapped 2024!
+
+Just analyzed my Reddit journey as u/${username}:
+📊 Activity stats
+🏆 Top posts
+🎯 Personality insights
+✨ And much more!
+
+Try it yourself! 👇`;
+
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(shareUrl)}`;
+    
+    console.log('Sharing to Twitter:', url);
+    
     try {
-      window.open(url, '_blank', 'noopener,noreferrer');
+      // Create a temporary link and click it
+      const link = document.createElement('a');
+      link.href = url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } catch (error) {
       console.error('Failed to open Twitter share:', error);
-      // Fallback: try using location.href
-      window.location.href = url;
+      alert('Opening Twitter failed. Please try again or share manually.');
     }
   };
 
   const shareOnReddit = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const url = `https://reddit.com/submit?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(`My Reddit Wrapped Results!`)}`;
+    
+    const redditTitle = `My Reddit Wrapped 2024 Results - u/${username}`;
+
+    const url = `https://reddit.com/submit?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(redditTitle)}`;
+    
+    console.log('Sharing to Reddit:', url);
+    
     try {
-      window.open(url, '_blank', 'noopener,noreferrer');
+      const link = document.createElement('a');
+      link.href = url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } catch (error) {
       console.error('Failed to open Reddit share:', error);
-      // Fallback: try using location.href
-      window.location.href = url;
+      alert('Opening Reddit failed. Please try again or share manually.');
     }
   };
 
@@ -477,15 +530,27 @@ export const SummarySlide = ({ username }: { username: string }) => {
     e.preventDefault();
     e.stopPropagation();
     
+    const copyText = `🎉 Check out my Reddit Wrapped 2024!
+
+I just analyzed my Reddit journey as u/${username} and discovered:
+📊 My complete activity stats
+🏆 My top posts and comments  
+🎯 My Reddit personality
+✨ And much more!
+
+Try Reddit Wrapped: ${shareUrl}
+
+#RedditWrapped`;
+
     try {
       // Try modern clipboard API first
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
-        alert('Link copied to clipboard! ✅');
+        await navigator.clipboard.writeText(copyText);
+        alert('✅ Link copied to clipboard!\n\nYou can now paste and share it anywhere!');
       } else {
         // Fallback for older browsers or restricted contexts
         const textArea = document.createElement('textarea');
-        textArea.value = `${shareText} ${shareUrl}`;
+        textArea.value = copyText;
         textArea.style.position = 'fixed';
         textArea.style.left = '-999999px';
         textArea.style.top = '-999999px';
@@ -494,18 +559,24 @@ export const SummarySlide = ({ username }: { username: string }) => {
         textArea.select();
         
         try {
-          document.execCommand('copy');
-          alert('Link copied to clipboard! ✅');
+          const successful = document.execCommand('copy');
+          if (successful) {
+            alert('✅ Link copied to clipboard!\n\nYou can now paste and share it anywhere!');
+          } else {
+            throw new Error('Copy command failed');
+          }
         } catch (err) {
           console.error('Fallback copy failed:', err);
-          alert('Copy failed. Please copy manually: ' + `${shareText} ${shareUrl}`);
+          // Show the text in an alert so user can manually copy
+          alert(`Copy this text to share:\n\n${copyText}`);
         }
         
         document.body.removeChild(textArea);
       }
     } catch (err) {
       console.error('Failed to copy:', err);
-      alert('Copy failed. Please copy manually: ' + `${shareText} ${shareUrl}`);
+      // Show the text in an alert so user can manually copy
+      alert(`Copy this text to share:\n\n${copyText}`);
     }
   };
 
