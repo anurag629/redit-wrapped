@@ -31,10 +31,6 @@ export const Splash = () => {
       >
         Get Started →
       </button>
-
-      <footer className="absolute bottom-4 text-white/50 text-sm">
-        <p>Powered by Reddit's public API</p>
-      </footer>
     </div>
   );
 };
