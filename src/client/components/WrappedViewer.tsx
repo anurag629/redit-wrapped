@@ -124,11 +124,11 @@ export const WrappedViewer = ({ username, stats, onReset }: WrappedViewerProps) 
       </div>
 
       {/* Progress Indicator */}
-      <div className="absolute top-4 left-0 right-0 flex gap-1.5 px-4 z-20 pointer-events-none">
+      <div className="absolute top-4 left-0 right-0 flex gap-1 sm:gap-1.5 px-3 sm:px-4 z-20 pointer-events-none">
         {slides.map((_, idx) => (
           <div
             key={idx}
-            className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
+            className={`h-1 sm:h-1.5 flex-1 rounded-full transition-all duration-500 ${
               idx === currentSlide
                 ? 'bg-white shadow-lg'
                 : idx < currentSlide
@@ -140,17 +140,17 @@ export const WrappedViewer = ({ username, stats, onReset }: WrappedViewerProps) 
       </div>
 
       {/* Navigation Buttons */}
-      <div className="absolute bottom-20 left-0 right-0 flex justify-center gap-4 px-4 z-20">
+      <div className="absolute bottom-24 sm:bottom-28 left-0 right-0 flex justify-center gap-2 sm:gap-4 px-3 sm:px-4 z-20">
         {currentSlide > 0 && (
           <button
             onClick={(e) => {
               e.stopPropagation();
               prevSlide();
             }}
-            className="bg-white/20 backdrop-blur-lg hover:bg-white/30 text-white px-8 py-4 rounded-full font-bold transition-all transform hover:scale-105 active:scale-95 shadow-xl border border-white/30"
+            className="bg-white/20 backdrop-blur-lg hover:bg-white/30 text-white px-4 sm:px-8 py-2.5 sm:py-4 rounded-full text-sm sm:text-base font-bold transition-all transform hover:scale-105 active:scale-95 shadow-xl border border-white/30"
             aria-label="Go to previous slide"
           >
-            ← Previous
+            ← <span className="hidden sm:inline">Previous</span>
           </button>
         )}
         {currentSlide === slides.length - 1 ? (
@@ -159,7 +159,7 @@ export const WrappedViewer = ({ username, stats, onReset }: WrappedViewerProps) 
               e.stopPropagation();
               onReset();
             }}
-            className="bg-white hover:bg-white/90 text-orange-600 px-10 py-4 rounded-full font-black text-lg transition-all transform hover:scale-105 active:scale-95 shadow-2xl"
+            className="bg-white hover:bg-white/90 text-orange-600 px-6 sm:px-10 py-2.5 sm:py-4 rounded-full font-black text-base sm:text-lg transition-all transform hover:scale-105 active:scale-95 shadow-2xl"
             aria-label="Start over with a new analysis"
           >
             ✨ Start Over
@@ -170,22 +170,22 @@ export const WrappedViewer = ({ username, stats, onReset }: WrappedViewerProps) 
               e.stopPropagation();
               nextSlide();
             }}
-            className="bg-white/20 backdrop-blur-lg hover:bg-white/30 text-white px-8 py-4 rounded-full font-bold transition-all transform hover:scale-105 active:scale-95 shadow-xl border border-white/30"
+            className="bg-white/20 backdrop-blur-lg hover:bg-white/30 text-white px-4 sm:px-8 py-2.5 sm:py-4 rounded-full text-sm sm:text-base font-bold transition-all transform hover:scale-105 active:scale-95 shadow-xl border border-white/30"
             aria-label="Go to next slide"
           >
-            Next →
+            <span className="hidden sm:inline">Next</span> →
           </button>
         )}
       </div>
 
       {/* Slide Counter */}
-      <div className="absolute bottom-4 right-4 text-white/60 text-sm font-bold z-20 pointer-events-none bg-black/20 backdrop-blur px-4 py-2 rounded-full" aria-label={`Slide ${currentSlide + 1} of ${slides.length}`}>
+      <div className="absolute bottom-4 sm:bottom-6 right-3 sm:right-4 text-white/60 text-xs sm:text-sm font-bold z-20 pointer-events-none bg-black/20 backdrop-blur px-3 sm:px-4 py-1.5 sm:py-2 rounded-full" aria-label={`Slide ${currentSlide + 1} of ${slides.length}`}>
         {currentSlide + 1} / {slides.length}
       </div>
 
       {/* Click hint (only on first slide) */}
       {currentSlide === 0 && (
-        <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 text-white/50 text-sm animate-pulse pointer-events-none z-10">
+        <div className="absolute bottom-36 sm:bottom-40 left-1/2 transform -translate-x-1/2 text-white/50 text-xs sm:text-sm animate-pulse pointer-events-none z-10">
           👆 Tap anywhere to continue
         </div>
       )}

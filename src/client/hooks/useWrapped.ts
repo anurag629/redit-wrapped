@@ -18,10 +18,11 @@ export const useWrapped = () => {
     setState({ data: null, loading: true, error: null });
 
     try {
+      // Don't pass limit - server will fetch ALL available posts and comments
       const res = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, limit: 500 }),
+        body: JSON.stringify({ username }),
       });
 
       const data: AnalyzeResponse | ErrorResponse = await res.json();

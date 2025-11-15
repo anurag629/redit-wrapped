@@ -138,7 +138,8 @@ router.post<unknown, AnalyzeResponse | ErrorResponse, AnalyzeRequest>(
   '/api/analyze',
   async (req, res): Promise<void> => {
     try {
-      const { username, limit = 500 } = req.body;
+      // Note: We don't pass a limit to fetch ALL posts and comments
+      const { username } = req.body;
 
       if (!username || typeof username !== 'string') {
         res.status(400).json({
@@ -171,10 +172,10 @@ router.post<unknown, AnalyzeResponse | ErrorResponse, AnalyzeRequest>(
         return;
       }
 
-      console.log(`Fetching data for user: ${cleanUsername}`);
+      console.log(`Fetching ALL data for user: ${cleanUsername} (no limit)`);
 
-      // Fetch Reddit data
-      const { profile, posts, comments } = await fetchCompleteUserData(reddit as any, cleanUsername, limit);
+      // Fetch Reddit data - no limit specified, will fetch all available data
+      const { profile, posts, comments } = await fetchCompleteUserData(reddit as any, cleanUsername);
 
       // Check if we have any data
       if (posts.length === 0 && comments.length === 0) {
