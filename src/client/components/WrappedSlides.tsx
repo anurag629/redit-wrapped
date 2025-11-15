@@ -445,24 +445,67 @@ export const ActivityTimeSlide = ({ stats }: SlideProps) => {
 // Slide 10: Final Summary
 export const SummarySlide = ({ username }: { username: string }) => {
   const shareText = `Check out my Reddit Wrapped! I discovered some interesting insights about my Reddit activity. #RedditWrapped`;
-  const shareUrl = window.location.href;
+  const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
 
-  const shareOnTwitter = () => {
+  const shareOnTwitter = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
-    window.open(url, '_blank');
-  };
-
-  const shareOnReddit = () => {
-    const url = `https://reddit.com/submit?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(`My Reddit Wrapped Results!`)}`;
-    window.open(url, '_blank');
-  };
-
-  const copyToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
-      alert('Link copied to clipboard!');
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } catch (error) {
+      console.error('Failed to open Twitter share:', error);
+      // Fallback: try using location.href
+      window.location.href = url;
+    }
+  };
+
+  const shareOnReddit = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const url = `https://reddit.com/submit?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(`My Reddit Wrapped Results!`)}`;
+    try {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } catch (error) {
+      console.error('Failed to open Reddit share:', error);
+      // Fallback: try using location.href
+      window.location.href = url;
+    }
+  };
+
+  const copyToClipboard = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    try {
+      // Try modern clipboard API first
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
+        alert('Link copied to clipboard! ✅');
+      } else {
+        // Fallback for older browsers or restricted contexts
+        const textArea = document.createElement('textarea');
+        textArea.value = `${shareText} ${shareUrl}`;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+          document.execCommand('copy');
+          alert('Link copied to clipboard! ✅');
+        } catch (err) {
+          console.error('Fallback copy failed:', err);
+          alert('Copy failed. Please copy manually: ' + `${shareText} ${shareUrl}`);
+        }
+        
+        document.body.removeChild(textArea);
+      }
     } catch (err) {
-      console.error('Failed to copy: ', err);
+      console.error('Failed to copy:', err);
+      alert('Copy failed. Please copy manually: ' + `${shareText} ${shareUrl}`);
     }
   };
 
@@ -492,10 +535,7 @@ export const SummarySlide = ({ username }: { username: string }) => {
         </div>
         <div className="flex flex-col sm:flex-row gap-3 md:gap-4 lg:gap-5 justify-center">
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              shareOnTwitter();
-            }}
+            onClick={shareOnTwitter}
             className="bg-blue-500 hover:bg-blue-600 text-white px-4 sm:px-6 md:px-8 py-2.5 md:py-3 lg:py-3.5 rounded-lg font-bold text-sm md:text-base lg:text-lg transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2 shadow-lg"
             aria-label="Share on Twitter"
           >
@@ -503,10 +543,7 @@ export const SummarySlide = ({ username }: { username: string }) => {
             <span>Twitter</span>
           </button>
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              shareOnReddit();
-            }}
+            onClick={shareOnReddit}
             className="bg-orange-500 hover:bg-orange-600 text-white px-4 sm:px-6 md:px-8 py-2.5 md:py-3 lg:py-3.5 rounded-lg font-bold text-sm md:text-base lg:text-lg transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2 shadow-lg"
             aria-label="Share on Reddit"
           >
@@ -514,10 +551,7 @@ export const SummarySlide = ({ username }: { username: string }) => {
             <span>Reddit</span>
           </button>
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              copyToClipboard();
-            }}
+            onClick={copyToClipboard}
             className="bg-gray-500 hover:bg-gray-600 text-white px-4 sm:px-6 md:px-8 py-2.5 md:py-3 lg:py-3.5 rounded-lg font-bold text-sm md:text-base lg:text-lg transition-all transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2 shadow-lg"
             aria-label="Copy link to clipboard"
           >
@@ -534,3 +568,132 @@ export const SummarySlide = ({ username }: { username: string }) => {
     </div>
   );
 };
+
+// NEW Slide: Your Impact
+export const ImpactSlide = ({ stats }: SlideProps) => (
+  <div className="flex flex-col items-center justify-start h-full gap-4 md:gap-6 lg:gap-8 p-4 sm:p-8 md:p-12 lg:p-16 pt-8 sm:pt-12 md:pt-16 lg:pt-20 pb-40 sm:pb-44 md:pb-48 lg:pb-52 bg-gradient-to-br from-violet-600 via-purple-600 to-fuchsia-600 text-white overflow-y-auto">
+    <div className="text-center">
+      <div className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl mb-3">💥</div>
+      <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black">Your Impact</h2>
+      <p className="text-sm sm:text-base md:text-lg lg:text-xl opacity-90 mt-2">The conversations you sparked</p>
+    </div>
+
+    <div className="w-full max-w-md md:max-w-lg lg:max-w-2xl space-y-4 md:space-y-5 lg:space-y-6">
+      <div className="bg-white/20 backdrop-blur-xl rounded-xl sm:rounded-2xl p-6 sm:p-8 md:p-10 lg:p-12 text-center border border-white/30 shadow-2xl">
+        <AnimatedNumber value={stats.insights.impact.totalEngagement} className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black" />
+        <div className="text-base sm:text-lg md:text-xl lg:text-2xl opacity-90 mt-2">Total Engagement</div>
+        <div className="text-xs sm:text-sm md:text-base lg:text-lg opacity-75 mt-2">Comments on your content</div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
+        <div className="bg-white/20 backdrop-blur-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 text-center border border-white/30 shadow-xl">
+          <div className="text-3xl sm:text-4xl md:text-5xl mb-2">🎯</div>
+          <AnimatedNumber value={stats.insights.impact.discussionsStarted} className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black" />
+          <div className="text-xs sm:text-sm md:text-base lg:text-lg opacity-90 mt-1">Discussions Started</div>
+        </div>
+
+        <div className="bg-white/20 backdrop-blur-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 text-center border border-white/30 shadow-xl">
+          <div className="text-3xl sm:text-4xl md:text-5xl mb-2">👥</div>
+          <AnimatedNumber value={stats.insights.impact.uniqueInteractions} className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black" />
+          <div className="text-xs sm:text-sm md:text-base lg:text-lg opacity-90 mt-1">Unique Interactions</div>
+        </div>
+      </div>
+
+      <div className="bg-white/20 backdrop-blur-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 border border-white/30 shadow-xl">
+        <div className="text-sm sm:text-base md:text-lg lg:text-xl opacity-90 mb-3 text-center">Engagement Rates</div>
+        <div className="grid grid-cols-2 gap-4 md:gap-6">
+          <div className="text-center">
+            <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black">{stats.insights.impact.avgRepliesPerPost}</div>
+            <div className="text-xs sm:text-sm md:text-base opacity-75 mt-1">replies per post</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black">{stats.insights.impact.avgRepliesPerComment}</div>
+            <div className="text-xs sm:text-sm md:text-base opacity-75 mt-1">replies per comment</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// NEW Slide: Top Words
+export const TopWordsSlide = ({ stats }: SlideProps) => (
+  <div className="flex flex-col items-center justify-start h-full gap-4 md:gap-6 lg:gap-8 p-4 sm:p-8 md:p-12 lg:p-16 pt-8 sm:pt-12 md:pt-16 lg:pt-20 pb-40 sm:pb-44 md:pb-48 lg:pb-52 bg-gradient-to-br from-teal-600 via-cyan-600 to-blue-600 text-white overflow-y-auto">
+    <div className="text-center">
+      <div className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl mb-3">💬</div>
+      <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black">Your Top Words</h2>
+      <p className="text-sm sm:text-base md:text-lg lg:text-xl opacity-90 mt-2">Words you use most often</p>
+    </div>
+
+    {stats.insights.topWords && stats.insights.topWords.length > 0 ? (
+      <div className="w-full max-w-md md:max-w-lg lg:max-w-2xl">
+        <div className="flex flex-wrap gap-3 md:gap-4 lg:gap-5 justify-center">
+          {stats.insights.topWords.slice(0, 12).map((wordStat, idx) => {
+            const size = Math.max(1, Math.min(3, Math.floor(wordStat.count / 10)));
+            const sizeClasses = [
+              'text-base sm:text-lg md:text-xl lg:text-2xl px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3',
+              'text-lg sm:text-xl md:text-2xl lg:text-3xl px-5 sm:px-6 md:px-7 py-2.5 sm:py-3 md:py-3.5',
+              'text-xl sm:text-2xl md:text-3xl lg:text-4xl px-6 sm:px-7 md:px-8 py-3 sm:py-3.5 md:py-4'
+            ];
+            
+            return (
+              <div
+                key={wordStat.word}
+                className={`bg-white/30 backdrop-blur-xl ${sizeClasses[size]} rounded-full font-bold border-2 border-white/40 shadow-lg transform hover:scale-110 transition-all animate-fade-in`}
+                style={{ animationDelay: `${idx * 50}ms` }}
+              >
+                <div className="text-center">
+                  <div>{wordStat.word}</div>
+                  <div className="text-xs sm:text-sm opacity-75">{wordStat.count}×</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    ) : (
+      <div className="text-center opacity-75 bg-white/10 backdrop-blur-xl rounded-xl sm:rounded-2xl p-8 max-w-md">
+        <p className="text-xl">Not enough text to analyze</p>
+      </div>
+    )}
+  </div>
+);
+
+// NEW Slide: Milestones
+export const MilestonesSlide = ({ stats }: SlideProps) => (
+  <div className="flex flex-col items-center justify-start h-full gap-4 md:gap-6 lg:gap-8 p-4 sm:p-8 md:p-12 lg:p-16 pt-8 sm:pt-12 md:pt-16 lg:pt-20 pb-40 sm:pb-44 md:pb-48 lg:pb-52 bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 text-white overflow-y-auto">
+    <div className="text-center">
+      <div className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl mb-3">🏆</div>
+      <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black">Your Milestones</h2>
+      <p className="text-sm sm:text-base md:text-lg lg:text-xl opacity-90 mt-2">Key achievements this year</p>
+    </div>
+
+    {stats.insights.milestones && stats.insights.milestones.length > 0 ? (
+      <div className="w-full max-w-md md:max-w-lg lg:max-w-2xl space-y-3 md:space-y-4 lg:space-y-5">
+        {stats.insights.milestones.map((milestone, idx) => (
+          <div
+            key={idx}
+            className="bg-white/20 backdrop-blur-xl rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 lg:p-10 border-2 border-yellow-300/50 shadow-2xl transform hover:scale-105 transition-all animate-slide-up"
+            style={{ animationDelay: `${idx * 100}ms` }}
+          >
+            <div className="flex items-center gap-4 md:gap-6">
+              <div className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl">{milestone.icon}</div>
+              <div className="flex-1 text-left">
+                <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black">{milestone.title}</div>
+                <div className="text-sm sm:text-base md:text-lg lg:text-xl opacity-90 mt-1">{milestone.description}</div>
+                {milestone.date && (
+                  <div className="text-xs sm:text-sm md:text-base opacity-75 mt-1">{milestone.date}</div>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    ) : (
+      <div className="text-center opacity-75 bg-white/10 backdrop-blur-xl rounded-xl sm:rounded-2xl p-8 max-w-md">
+        <p className="text-xl">Keep being awesome! More milestones coming soon! 🚀</p>
+      </div>
+    )}
+  </div>
+);
+

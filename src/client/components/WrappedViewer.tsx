@@ -10,6 +10,9 @@ import {
   TopPostSlide,
   TopCommentSlide,
   ActivityTimeSlide,
+  ImpactSlide,
+  TopWordsSlide,
+  MilestonesSlide,
   SummarySlide,
 } from './WrappedSlides';
 
@@ -61,9 +64,12 @@ export const WrappedViewer = ({ username, stats, onReset }: WrappedViewerProps) 
     <WelcomeSlide key="welcome" username={username} />,
     <AccountOverviewSlide key="overview" username={username} stats={stats} />,
     <ActivityStatsSlide key="activity" username={username} stats={stats} />,
+    <ImpactSlide key="impact" username={username} stats={stats} />,
+    <TopWordsSlide key="topwords" username={username} stats={stats} />,
     <TopSubredditsSlide key="subreddits" username={username} stats={stats} />,
     <PersonalitySlide key="personality" username={username} stats={stats} />,
     <BadgesSlide key="badges" username={username} stats={stats} />,
+    <MilestonesSlide key="milestones" username={username} stats={stats} />,
     <TopPostSlide key="post" username={username} stats={stats} />,
     <TopCommentSlide key="comment" username={username} stats={stats} />,
     <ActivityTimeSlide key="time" username={username} stats={stats} />,

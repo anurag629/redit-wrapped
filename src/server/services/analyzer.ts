@@ -6,6 +6,9 @@ import type {
   SubredditActivity,
   ActivityPattern,
   UserInsights,
+  WordStats,
+  Milestone,
+  ImpactStats,
 } from '../../shared/types/api';
 
 /**
@@ -326,6 +329,186 @@ function extractTopics(topSubreddits: SubredditActivity[]): string[] {
 }
 
 /**
+ * Analyze top words from user's posts and comments
+ */
+function analyzeTopWords(posts: RedditPost[], comments: RedditComment[]): WordStats[] {
+  const wordCount = new Map<string, number>();
+  
+  // Common words to exclude
+  const stopWords = new Set([
+    'the', 'be', 'to', 'of', 'and', 'a', 'in', 'that', 'have', 'i', 'it', 'for', 'not',
+    'on', 'with', 'he', 'as', 'you', 'do', 'at', 'this', 'but', 'his', 'by', 'from',
+    'they', 'we', 'say', 'her', 'she', 'or', 'an', 'will', 'my', 'one', 'all', 'would',
+    'there', 'their', 'what', 'so', 'up', 'out', 'if', 'about', 'who', 'get', 'which',
+    'go', 'me', 'when', 'make', 'can', 'like', 'time', 'no', 'just', 'him', 'know',
+    'take', 'people', 'into', 'year', 'your', 'good', 'some', 'could', 'them', 'see',
+    'other', 'than', 'then', 'now', 'look', 'only', 'come', 'its', 'over', 'think',
+    'also', 'back', 'after', 'use', 'two', 'how', 'our', 'work', 'first', 'well',
+    'way', 'even', 'new', 'want', 'because', 'any', 'these', 'give', 'day', 'most',
+    'us', 'is', 'was', 'are', 'been', 'has', 'had', 'were', 'said', 'did', 'having',
+    'may', 'am', 'im', 'ive', 'dont', 'doesnt', 'cant', 'wont', 'isnt', 'arent',
+    'thats', 'its', 'youre', 'theyre', 'hes', 'shes', 'very', 'more', 'https', 'www',
+    'com', 'http', 'deleted', 'removed'
+  ]);
+
+  // Collect all text
+  const allText = [
+    ...posts.map(p => p.title + ' ' + p.selftext),
+    ...comments.map(c => c.body)
+  ].join(' ').toLowerCase();
+
+  // Extract words (alphanumeric, 3+ characters)
+  const words = allText.match(/\b[a-z]{3,}\b/g) || [];
+
+  // Count word frequency
+  for (const word of words) {
+    if (!stopWords.has(word)) {
+      wordCount.set(word, (wordCount.get(word) || 0) + 1);
+    }
+  }
+
+  // Sort by frequency and return top 15
+  return Array.from(wordCount.entries())
+    .map(([word, count]) => ({ word, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 15);
+}
+
+/**
+ * Calculate impact metrics
+ */
+function calculateImpact(
+  posts: RedditPost[],
+  comments: RedditComment[]
+): ImpactStats {
+  const totalEngagement = posts.reduce((sum, p) => sum + p.num_comments, 0);
+  const totalReplies = totalEngagement; // Approximation
+  const avgRepliesPerPost = posts.length > 0 ? totalReplies / posts.length : 0;
+  const avgRepliesPerComment = comments.length > 0 ? totalEngagement / (comments.length * 10) : 0;
+  
+  // Unique subreddits = unique interactions estimate
+  const uniqueSubreddits = new Set([
+    ...posts.map(p => p.subreddit),
+    ...comments.map(c => c.subreddit)
+  ]);
+  const uniqueInteractions = uniqueSubreddits.size * 10; // Rough estimate
+  
+  // Posts with 5+ comments count as discussions started
+  const discussionsStarted = posts.filter(p => p.num_comments >= 5).length;
+
+  return {
+    totalEngagement,
+    totalReplies,
+    avgRepliesPerPost: Math.round(avgRepliesPerPost * 10) / 10,
+    avgRepliesPerComment: Math.round(avgRepliesPerComment * 10) / 10,
+    uniqueInteractions,
+    discussionsStarted
+  };
+}
+
+/**
+ * Identify key milestones
+ */
+function identifyMilestones(
+  profile: RedditUser,
+  posts: RedditPost[],
+  comments: RedditComment[],
+  topSubreddits: SubredditActivity[]
+): Milestone[] {
+  const milestones: Milestone[] = [];
+  
+  // Account age milestones
+  const accountAgeYears = Math.floor((Date.now() / 1000 - profile.created_utc) / (365 * 24 * 60 * 60));
+  if (accountAgeYears >= 10) {
+    milestones.push({
+      title: '10 Year Veteran',
+      description: 'A decade on Reddit!',
+      icon: '🎂'
+    });
+  } else if (accountAgeYears >= 5) {
+    milestones.push({
+      title: '5 Years Strong',
+      description: 'Half a decade of Reddit!',
+      icon: '🎉'
+    });
+  } else if (accountAgeYears >= 1) {
+    milestones.push({
+      title: 'Cake Day Anniversary',
+      description: `${accountAgeYears} year${accountAgeYears > 1 ? 's' : ''} on Reddit`,
+      icon: '🍰'
+    });
+  }
+
+  // Karma milestones
+  if (profile.total_karma >= 100000) {
+    milestones.push({
+      title: '100K Karma Club',
+      description: 'Six figures of internet points!',
+      icon: '💰'
+    });
+  } else if (profile.total_karma >= 50000) {
+    milestones.push({
+      title: '50K Karma Milestone',
+      description: 'Halfway to legendary status!',
+      icon: '⭐'
+    });
+  } else if (profile.total_karma >= 10000) {
+    milestones.push({
+      title: '10K Karma Achieved',
+      description: 'Five digits of glory!',
+      icon: '✨'
+    });
+  }
+
+  // Activity milestones
+  const totalActivity = posts.length + comments.length;
+  if (totalActivity >= 5000) {
+    milestones.push({
+      title: 'Super Contributor',
+      description: '5000+ posts and comments!',
+      icon: '🔥'
+    });
+  } else if (totalActivity >= 1000) {
+    milestones.push({
+      title: 'Prolific Redditor',
+      description: '1000+ contributions!',
+      icon: '📊'
+    });
+  }
+
+  // Top post milestone
+  const topPost = posts.reduce((max, p) => p.score > max.score ? p : max, posts[0] || { score: 0 });
+  if (topPost && topPost.score >= 1000) {
+    milestones.push({
+      title: 'Viral Post',
+      description: `${topPost.score.toLocaleString()} upvotes!`,
+      icon: '🚀'
+    });
+  }
+
+  // Community diversity
+  if (topSubreddits.length >= 10) {
+    milestones.push({
+      title: 'Community Explorer',
+      description: `Active in ${topSubreddits.length}+ communities`,
+      icon: '🗺️'
+    });
+  }
+
+  // Engagement milestone
+  const totalComments = posts.reduce((sum, p) => sum + p.num_comments, 0);
+  if (totalComments >= 5000) {
+    milestones.push({
+      title: 'Discussion Master',
+      description: `${totalComments.toLocaleString()} comments on your posts!`,
+      icon: '💬'
+    });
+  }
+
+  return milestones.slice(0, 6); // Return top 6 milestones
+}
+
+/**
  * Main analysis function
  */
 export function analyzeUserData(
@@ -364,6 +547,11 @@ export function analyzeUserData(
   const negativeItems = [...posts, ...comments].filter((item) => item.score < 0).length;
   const controversialScore = (negativeItems / (posts.length + comments.length)) * 100;
 
+  // Calculate new insights
+  const topWords = analyzeTopWords(posts, comments);
+  const impact = calculateImpact(posts, comments);
+  const milestones = identifyMilestones(profile, posts, comments, topSubreddits);
+
   const insights: UserInsights = {
     personality,
     badges,
@@ -371,6 +559,9 @@ export function analyzeUserData(
     topicsOfInterest,
     controversialScore: Math.round(controversialScore),
     sentimentScore: Math.round(sentimentScore),
+    topWords,
+    impact,
+    milestones,
   };
 
   const accountAge = Math.floor((Date.now() / 1000 - profile.created_utc) / (365 * 24 * 60 * 60));

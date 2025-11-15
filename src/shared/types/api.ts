@@ -45,6 +45,27 @@ export interface ActivityPattern {
   seasonalActivity: number[];
 }
 
+export interface Milestone {
+  title: string;
+  description: string;
+  icon: string;
+  date?: string;
+}
+
+export interface ImpactStats {
+  totalEngagement: number;
+  totalReplies: number;
+  avgRepliesPerPost: number;
+  avgRepliesPerComment: number;
+  uniqueInteractions: number;
+  discussionsStarted: number;
+}
+
+export interface WordStats {
+  word: string;
+  count: number;
+}
+
 export interface UserInsights {
   personality: string;
   badges: string[];
@@ -52,6 +73,9 @@ export interface UserInsights {
   topicsOfInterest: string[];
   controversialScore: number;
   sentimentScore: number;
+  topWords: WordStats[];
+  milestones: Milestone[];
+  impact: ImpactStats;
 }
 
 export interface WrappedStats {
