@@ -174,7 +174,7 @@ router.post<unknown, AnalyzeResponse | ErrorResponse, AnalyzeRequest>(
       console.log(`Fetching data for user: ${cleanUsername}`);
 
       // Fetch Reddit data
-      const { profile, posts, comments } = await fetchCompleteUserData(cleanUsername, limit);
+      const { profile, posts, comments } = await fetchCompleteUserData(reddit, cleanUsername, limit);
 
       // Analyze data
       const stats = analyzeUserData(profile, posts, comments);
