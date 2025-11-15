@@ -33,5 +33,8 @@
   },
   "triggers": {
     "onAppInstall": "/internal/on-app-install"
+  },
+  "dev": {
+    "subreddit": "redit_wrapped_dev"
   }
 }
