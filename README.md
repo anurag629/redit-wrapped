@@ -1,143 +1,284 @@
-# Reddit Wrapped 2024 🎉
+# Reddit Wrapped 🎉# Reddit Wrapped 2024 🎉
 
-An immersive, Spotify Wrapped-style experience for Reddit users to visualize their yearly activity, engagement, and contributions on the platform.
 
-## 🌟 Features
 
-### Core Statistics
+> Your personalized year-in-review experience for Reddit! Just like Spotify Wrapped, but for your Reddit activity.An immersive, Spotify Wrapped-style experience for Reddit users to visualize their yearly activity, engagement, and contributions on the platform.
+
+
+
+![Reddit Wrapped](https://img.shields.io/badge/Reddit-Wrapped-FF4500?style=for-the-badge&logo=reddit)## 🌟 Features
+
+![Version](https://img.shields.io/badge/version-0.0.2.20-blue?style=for-the-badge)
+
+![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)### Core Statistics
+
 - **Total Contributions**: ALL posts and comments (no limits!)
-- **Karma Breakdown**: Post karma vs comment karma from complete history
-- **Top Subreddits**: Most active communities with detailed stats
-- **Top Post**: Your most upvoted post with direct link
-- **Top Comment**: Your highest-scoring comment with context link
-- **Activity Patterns**: Hourly, daily, and monthly trends across all activity
-- **Seasonal Activity**: Breakdown by Winter, Spring, Summer, Fall
-- **Personality Insights**: AI-analyzed personality type and comment style
-- **Achievement Badges**: Earned based on comprehensive activity patterns
 
-### User Experience
-- **🎨 Beautiful UI**: Gradient backgrounds, smooth animations, glassmorphism effects
-- **📱 Mobile-First**: Touch gestures, swipe navigation, responsive design
-- **♿ Accessibility**: ARIA labels, keyboard navigation, screen reader support
-- **💾 Progress Saving**: Resume from where you left off
-- **🔗 Social Sharing**: Share to Twitter, Reddit, or copy link
-- **🔄 Error Recovery**: Graceful error handling with retry options
+## 🌟 What is Reddit Wrapped?- **Karma Breakdown**: Post karma vs comment karma from complete history
+
+- **Top Subreddits**: Most active communities with detailed stats
+
+Reddit Wrapped is an interactive web experience that analyzes your Reddit activity and presents it in a beautiful, engaging slideshow. Discover your most active communities, your top posts, your unique personality traits, and much more!- **Top Post**: Your most upvoted post with direct link
+
+- **Top Comment**: Your highest-scoring comment with context link
+
+## ✨ Features- **Activity Patterns**: Hourly, daily, and monthly trends across all activity
+
+- **Seasonal Activity**: Breakdown by Winter, Spring, Summer, Fall
+
+### 📊 Comprehensive Analytics- **Personality Insights**: AI-analyzed personality type and comment style
+
+- **Complete Activity Overview**: Total posts, comments, and karma earned- **Achievement Badges**: Earned based on comprehensive activity patterns
+
+- **Top Communities**: Your most active subreddits with detailed statistics
+
+- **Top Content**: Your highest-scoring post and comment with direct links### User Experience
+
+- **Activity Patterns**: When you're most active (hourly, daily, seasonal)- **🎨 Beautiful UI**: Gradient backgrounds, smooth animations, glassmorphism effects
+
+- **Personality Insights**: AI-analyzed traits based on your commenting style- **📱 Mobile-First**: Touch gestures, swipe navigation, responsive design
+
+- **Achievement Badges**: Unlock badges based on your Reddit journey- **♿ Accessibility**: ARIA labels, keyboard navigation, screen reader support
+
+- **Your Impact**: See how your contributions sparked discussions- **💾 Progress Saving**: Resume from where you left off
+
+- **Top Words**: Word cloud of your most-used words- **🔗 Social Sharing**: Share to Twitter, Reddit, or copy link
+
+- **Milestones**: Celebrate your major Reddit achievements- **🔄 Error Recovery**: Graceful error handling with retry options
+
 - **⚡ Performance**: Redis caching with 1-hour TTL
 
-### Accessibility Features
-- Full keyboard navigation (Arrow keys, Home, End, Escape)
-- ARIA labels on all interactive elements
-- Focus indicators for keyboard users
-- Screen reader announcements
-- High contrast mode support
+### 🎨 Beautiful Experience
+
+- **13 Interactive Slides**: Each revealing different aspects of your Reddit year### Accessibility Features
+
+- **Smooth Animations**: Fade-ins, slide transitions, and dynamic effects- Full keyboard navigation (Arrow keys, Home, End, Escape)
+
+- **Responsive Design**: Perfect on mobile, tablet, and desktop- ARIA labels on all interactive elements
+
+- **Modern UI**: Gradient backgrounds, glassmorphism, and elegant typography- Focus indicators for keyboard users
+
+- **Touch Gestures**: Swipe through slides on mobile devices- Screen reader announcements
+
+- **Keyboard Navigation**: Arrow keys, Home, End, and Escape support- High contrast mode support
+
 - Reduced motion support
 
-## 🚀 Technology Stack
+### 🔗 Share Your Story
 
-- **[Devvit](https://developers.reddit.com/)**: Reddit's developer platform for building apps
+- **Share on Twitter**: Tweet your Reddit Wrapped results## 🚀 Technology Stack
+
+- **Share on Reddit**: Post to your favorite subreddit
+
+- **Copy Link**: Grab a link to share anywhere- **[Devvit](https://developers.reddit.com/)**: Reddit's developer platform for building apps
+
 - **[React](https://react.dev/)**: v19 for UI components
-- **[Vite](https://vite.dev/)**: v6.2.4 for fast builds
-- **[Express](https://expressjs.com/)**: v5.1.0 for backend API
-- **[Tailwind CSS](https://tailwindcss.com/)**: v4.1.6 for styling
-- **[TypeScript](https://www.typescriptlang.org/)**: v5.8.2 for type safety
-- **[Redis](https://redis.io/)**: For caching user data
 
-## 📋 Prerequisites
+### ♿ Accessibility First- **[Vite](https://vite.dev/)**: v6.2.4 for fast builds
 
-- Node.js 22 or higher
-- npm or yarn
-- Reddit account connected to Reddit Developers
-- Devvit CLI installed
+- Full keyboard navigation- **[Express](https://expressjs.com/)**: v5.1.0 for backend API
 
-## 🛠️ Installation
+- Screen reader support with ARIA labels- **[Tailwind CSS](https://tailwindcss.com/)**: v4.1.6 for styling
 
-### 1. **Create the Project**
+- High contrast mode compatible- **[TypeScript](https://www.typescriptlang.org/)**: v5.8.2 for type safety
 
-```bash
+- Reduced motion support for accessibility preferences- **[Redis](https://redis.io/)**: For caching user data
+
+
+
+## 🚀 How to Use## 📋 Prerequisites
+
+
+
+1. **Visit the App**: Go to [Reddit Wrapped](https://www.reddit.com/r/redit_wrapped_dev) (or wherever the app is installed)- Node.js 22 or higher
+
+2. **Enter Username**: Type any Reddit username (without the u/ prefix)- npm or yarn
+
+3. **Explore**: Swipe or click through 13 beautifully designed slides- Reddit account connected to Reddit Developers
+
+4. **Share**: Show off your Reddit year with friends!- Devvit CLI installed
+
+
+
+### Tips for Best Results## 🛠️ Installation
+
+- Works with any **public** Reddit profile
+
+- Fetches all available posts and comments (Reddit API may limit to ~1000 most recent)### 1. **Create the Project**
+
+- Results are cached for 1 hour for faster loading
+
+- Try well-known accounts like `spez`, `reddit`, or your own!```bash
+
 npm create devvit@latest --template=react
-# Or use this repository
-git clone <your-repo-url>
-cd redit-wrapped
-npm install
-```
 
-### 2. **Authenticate with Devvit**
+## 📱 Supported Devices# Or use this repository
+
+git clone <your-repo-url>
+
+Reddit Wrapped works great on:cd redit-wrapped
+
+- 📱 Mobile phones (iOS & Android)npm install
+
+- 📱 Tablets```
+
+- 💻 Laptops
+
+- 🖥️ Desktop computers### 2. **Authenticate with Devvit**
+
+- 📺 Large displays
 
 ```bash
-npm run login
+
+The app automatically adapts to your screen size for the best experience!npm run login
+
 # Or
-npx devvit login
+
+## 🎮 Navigationnpx devvit login
+
 ```
 
-This will open a browser window for Reddit authentication.
+### Touch Devices
+
+- **Swipe left/right**: Navigate between slidesThis will open a browser window for Reddit authentication.
+
+- **Tap anywhere**: Go to next slide
 
 ### 3. **Verify Authentication**
 
-```bash
-npx devvit whoami
-```
+### Desktop
+
+- **Click anywhere**: Go to next slide```bash
+
+- **Arrow keys**: Navigate back and forthnpx devvit whoami
+
+- **Home/End**: Jump to first/last slide```
+
+- **Escape**: Exit to splash screen
 
 You should see your Reddit username.
 
+## 🔒 Privacy & Data
+
 ## 🎮 Development
 
-### Start Development Server
+- **No Data Storage**: We don't store any of your Reddit data permanently
 
-```bash
-npm run dev
+- **Cache Only**: Data is temporarily cached for 1 hour for performance### Start Development Server
+
+- **Public Data Only**: Only publicly available information is analyzed
+
+- **No Authentication Required**: You don't need to log in with your Reddit account```bash
+
+- **Reddit API**: All data comes directly from Reddit's official APInpm run dev
+
 ```
 
+## ⚠️ Limitations
+
 This starts three concurrent processes:
-- **CLIENT**: Frontend build (Vite)
-- **SERVER**: Backend build (Vite + Express)
-- **DEVVIT**: Playtest environment
+
+- **Private Profiles**: Cannot access data from private Reddit accounts- **CLIENT**: Frontend build (Vite)
+
+- **Deleted Content**: Removed or deleted posts/comments are not included- **SERVER**: Backend build (Vite + Express)
+
+- **API Limits**: Reddit's API may limit historical data to ~1000 recent items per type- **DEVVIT**: Playtest environment
+
+- **Rate Limiting**: Rapid repeated requests may be throttled by Reddit
 
 ### Access the App
 
+## 🐛 Troubleshooting
+
 Once running, Devvit will provide a URL to test your app on Reddit.
 
-### Test with Public Profiles
+### "0 contributions" or no data showing?
+
+- The profile might be private or have no public activity### Test with Public Profiles
+
+- Try a well-known public account like `spez` to verify the app is working
 
 For initial testing, use well-known public Reddit accounts:
-- `spez` (Reddit CEO)
-- `reddit` (Official Reddit account)
-- `AutoModerator` (Bot account)
 
-## 📦 Build & Deploy
+### Buttons not working?- `spez` (Reddit CEO)
 
-### Build for Production
+- Make sure you're using a modern browser (Chrome, Firefox, Safari, Edge)- `reddit` (Official Reddit account)
 
-```bash
+- Try refreshing the page- `AutoModerator` (Bot account)
+
+
+
+### Data seems outdated?## 📦 Build & Deploy
+
+- Wait 1 hour for the cache to expire, or try a different username
+
+- Reddit's API may take time to reflect very recent activity### Build for Production
+
+
+
+## 🤝 Contributing```bash
+
 npm run build
-```
 
-Compiles both client and server for production.
+Want to improve Reddit Wrapped? Check out our [CONTRIBUTING.md](./CONTRIBUTING.md) guide for developers!```
 
-### Deploy to Reddit
 
-```bash
+
+## 📄 LicenseCompiles both client and server for production.
+
+
+
+This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.### Deploy to Reddit
+
+
+
+## 🙏 Credits```bash
+
 npm run deploy
-```
 
-Uploads a new version of your app to Reddit's platform.
+- Built with ❤️ using [Reddit's Devvit Platform](https://developers.reddit.com/)```
 
-### Publish for Review
+- Inspired by Spotify Wrapped and other year-in-review experiences
 
-```bash
-npm run launch
-```
+- Special thanks to the Devvit communityUploads a new version of your app to Reddit's platform.
+
+
+
+## 📞 Support & Feedback### Publish for Review
+
+
+
+- 💬 Questions? Visit [r/Devvit](https://www.reddit.com/r/devvit)```bash
+
+- 🐛 Found a bug? [Open an issue](https://github.com/anurag629/redit-wrapped/issues)npm run launch
+
+- 💡 Have an idea? Share it in the discussions!```
+
+- 🎮 Join the [Devvit Discord](https://discord.gg/Cd43ExtEFS)
 
 Submits your app for Reddit's approval process.
 
+---
+
 ## 🧪 Testing & Quality
+
+<div align="center">
 
 ### Type Checking & Linting
 
+**Discover your Reddit story** ✨
+
 ```bash
-npm run check
+
+Made with 🔥 by [u/anurag629](https://reddit.com/u/anurag629)npm run check
+
 ```
 
+[Try Reddit Wrapped](https://www.reddit.com/r/redit_wrapped_dev) • [Report Bug](https://github.com/anurag629/redit-wrapped/issues) • [Request Feature](https://github.com/anurag629/redit-wrapped/issues)
+
 Runs TypeScript type checking, ESLint, and Prettier.
+
+</div>
 
 ### Run Tests
 
