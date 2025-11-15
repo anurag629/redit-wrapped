@@ -1,7 +1,16 @@
 import express from 'express';
-import { InitResponse, IncrementResponse, DecrementResponse } from '../shared/types/api';
+import {
+  InitResponse,
+  IncrementResponse,
+  DecrementResponse,
+  AnalyzeRequest,
+  AnalyzeResponse,
+  ErrorResponse,
+} from '../shared/types/api';
 import { redis, reddit, createServer, context, getServerPort } from '@devvit/web/server';
 import { createPost } from './core/post';
+import { fetchCompleteUserData, RedditApiError } from './services/redditApi';
+import { analyzeUserData } from './services/analyzer';
 
 const app = express();
 
@@ -123,6 +132,83 @@ router.post('/internal/menu/post-create', async (_req, res): Promise<void> => {
     });
   }
 });
+
+// Reddit Wrapped Endpoints
+router.post<unknown, AnalyzeResponse | ErrorResponse, AnalyzeRequest>(
+  '/api/analyze',
+  async (req, res): Promise<void> => {
+    try {
+      const { username, limit = 100 } = req.body;
+
+      if (!username || typeof username !== 'string') {
+        res.status(400).json({
+          type: 'error',
+          message: 'Username is required',
+          code: 'INVALID_REQUEST',
+        });
+        return;
+      }
+
+      // Clean username (remove u/ prefix if present)
+      const cleanUsername = username.replace(/^u\//, '').trim();
+
+      if (!cleanUsername) {
+        res.status(400).json({
+          type: 'error',
+          message: 'Invalid username',
+          code: 'INVALID_USERNAME',
+        });
+        return;
+      }
+
+      // Check cache first
+      const cacheKey = `wrapped:${cleanUsername}`;
+      const cached = await redis.get(cacheKey);
+
+      if (cached) {
+        console.log(`Cache hit for user: ${cleanUsername}`);
+        res.json(JSON.parse(cached));
+        return;
+      }
+
+      console.log(`Fetching data for user: ${cleanUsername}`);
+
+      // Fetch Reddit data
+      const { profile, posts, comments } = await fetchCompleteUserData(cleanUsername, limit);
+
+      // Analyze data
+      const stats = analyzeUserData(profile, posts, comments);
+
+      const response: AnalyzeResponse = {
+        type: 'analyze',
+        username: cleanUsername,
+        stats,
+        generatedAt: Date.now(),
+      };
+
+      // Cache for 1 hour (3600 seconds)
+      await redis.set(cacheKey, JSON.stringify(response), { expiration: new Date(Date.now() + 3600000) });
+
+      res.json(response);
+    } catch (error) {
+      if (error instanceof RedditApiError) {
+        res.status(error.code === 'USER_NOT_FOUND' ? 404 : 400).json({
+          type: 'error',
+          message: error.message,
+          code: error.code,
+        });
+        return;
+      }
+
+      console.error('Error analyzing user:', error);
+      res.status(500).json({
+        type: 'error',
+        message: 'Failed to analyze user profile',
+        code: 'INTERNAL_ERROR',
+      });
+    }
+  }
+);
 
 // Use router middleware
 app.use(router);

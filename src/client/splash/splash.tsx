@@ -1,53 +1,39 @@
 import '../index.css';
 
-import { navigateTo } from '@devvit/web/client';
-import { context, requestExpandedMode } from '@devvit/web/client';
+import { requestExpandedMode } from '@devvit/web/client';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
 export const Splash = () => {
   return (
-    <div className="flex relative flex-col justify-center items-center min-h-screen gap-4">
-      <img className="object-contain w-1/2 max-w-[250px] mx-auto" src="/snoo.png" alt="Snoo" />
-      <div className="flex flex-col items-center gap-2">
-        <h1 className="text-2xl font-bold text-center text-gray-900 ">
-          Hey {context.username ?? 'user'} 👋
-        </h1>
-        <p className="text-base text-center text-gray-600 ">
-          Edit{' '}
-          <span className="bg-[#e5ebee]  px-1 py-0.5 rounded">src/client/splash/splash.tsx</span> to
-          get started.
+    <div className="flex relative flex-col justify-center items-center min-h-screen gap-8 bg-gradient-to-br from-orange-500 to-red-600">
+      <div className="text-center space-y-4">
+        <img className="object-contain w-32 h-32 mx-auto" src="/snoo.png" alt="Snoo" />
+        <h1 className="text-5xl font-black text-white">Reddit Wrapped</h1>
+        <p className="text-xl text-white/90">Discover your Reddit story</p>
+      </div>
+
+      <div className="bg-white/10 backdrop-blur rounded-2xl p-8 max-w-md text-center space-y-4">
+        <p className="text-white text-lg">
+          Get a comprehensive analysis of any Reddit profile
         </p>
+        <ul className="text-white/80 text-sm space-y-2">
+          <li>📊 Detailed activity statistics</li>
+          <li>🏆 Top posts and comments</li>
+          <li>🎯 Personality insights</li>
+          <li>🎨 Beautiful visualizations</li>
+        </ul>
       </div>
-      <div className="flex items-center justify-center mt-5">
-        <button
-          className="flex items-center justify-center bg-[#d93900] text-white w-auto h-10 rounded-full cursor-pointer transition-colors px-4"
-          onClick={(e) => requestExpandedMode(e.nativeEvent, 'game')}
-        >
-          Tap to Start
-        </button>
-      </div>
-      <footer className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-3 text-[0.8em] text-gray-600">
-        <button
-          className="cursor-pointer"
-          onClick={() => navigateTo('https://developers.reddit.com/docs')}
-        >
-          Docs
-        </button>
-        <span className="text-gray-300">|</span>
-        <button
-          className="cursor-pointer"
-          onClick={() => navigateTo('https://www.reddit.com/r/Devvit')}
-        >
-          r/Devvit
-        </button>
-        <span className="text-gray-300">|</span>
-        <button
-          className="cursor-pointer"
-          onClick={() => navigateTo('https://discord.com/invite/R7yu2wh9Qz')}
-        >
-          Discord
-        </button>
+
+      <button
+        className="bg-white hover:bg-white/90 text-orange-600 font-bold text-lg px-8 py-4 rounded-full cursor-pointer transition-all transform hover:scale-105"
+        onClick={(e) => requestExpandedMode(e.nativeEvent, 'game')}
+      >
+        Get Started →
+      </button>
+
+      <footer className="absolute bottom-4 text-white/50 text-sm">
+        <p>Powered by Reddit's public API</p>
       </footer>
     </div>
   );
