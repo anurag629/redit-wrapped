@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { WrappedStats } from '../../shared/types/api';
 import {
   WelcomeSlide,
@@ -21,6 +21,7 @@ interface WrappedViewerProps {
 
 export const WrappedViewer = ({ username, stats, onReset }: WrappedViewerProps) => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [transitioning, setTransitioning] = useState(false);
 
   const slides = [
     <WelcomeSlide key="welcome" username={username} />,
@@ -35,46 +36,63 @@ export const WrappedViewer = ({ username, stats, onReset }: WrappedViewerProps) 
     <SummarySlide key="summary" username={username} />,
   ];
 
+  useEffect(() => {
+    if (transitioning) {
+      const timer = setTimeout(() => setTransitioning(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [transitioning]);
+
   const nextSlide = () => {
-    if (currentSlide < slides.length - 1) {
+    if (currentSlide < slides.length - 1 && !transitioning) {
+      setTransitioning(true);
       setCurrentSlide(currentSlide + 1);
     }
   };
 
   const prevSlide = () => {
-    if (currentSlide > 0) {
+    if (currentSlide > 0 && !transitioning) {
+      setTransitioning(true);
       setCurrentSlide(currentSlide - 1);
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowRight' || e.key === ' ') {
+      e.preventDefault();
       nextSlide();
     } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
       prevSlide();
     }
   };
 
   return (
     <div
-      className="relative w-full h-screen overflow-hidden bg-black"
+      className="relative w-full h-screen overflow-hidden bg-black select-none"
       onClick={nextSlide}
       onKeyDown={handleKeyDown}
       tabIndex={0}
     >
-      {/* Current Slide */}
-      <div className="w-full h-full transition-opacity duration-500">{slides[currentSlide]}</div>
+      {/* Current Slide with fade transition */}
+      <div
+        className={`w-full h-full transition-all duration-500 ${
+          transitioning ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
+        }`}
+      >
+        {slides[currentSlide]}
+      </div>
 
       {/* Progress Indicator */}
-      <div className="absolute top-4 left-0 right-0 flex gap-1 px-4">
+      <div className="absolute top-4 left-0 right-0 flex gap-1.5 px-4 z-20 pointer-events-none">
         {slides.map((_, idx) => (
           <div
             key={idx}
-            className={`h-1 flex-1 rounded-full transition-all duration-300 ${
+            className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
               idx === currentSlide
-                ? 'bg-white'
+                ? 'bg-white shadow-lg'
                 : idx < currentSlide
-                  ? 'bg-white/50'
+                  ? 'bg-white/60'
                   : 'bg-white/20'
             }`}
           />
@@ -82,14 +100,14 @@ export const WrappedViewer = ({ username, stats, onReset }: WrappedViewerProps) 
       </div>
 
       {/* Navigation Buttons */}
-      <div className="absolute bottom-8 left-0 right-0 flex justify-center gap-4 px-4">
+      <div className="absolute bottom-8 left-0 right-0 flex justify-center gap-4 px-4 z-20">
         {currentSlide > 0 && (
           <button
             onClick={(e) => {
               e.stopPropagation();
               prevSlide();
             }}
-            className="bg-white/20 backdrop-blur hover:bg-white/30 text-white px-6 py-3 rounded-full font-semibold transition-colors"
+            className="bg-white/20 backdrop-blur-lg hover:bg-white/30 text-white px-8 py-4 rounded-full font-bold transition-all transform hover:scale-105 active:scale-95 shadow-xl border border-white/30"
           >
             ← Previous
           </button>
@@ -100,9 +118,9 @@ export const WrappedViewer = ({ username, stats, onReset }: WrappedViewerProps) 
               e.stopPropagation();
               onReset();
             }}
-            className="bg-white hover:bg-white/90 text-orange-600 px-8 py-3 rounded-full font-bold transition-colors"
+            className="bg-white hover:bg-white/90 text-orange-600 px-10 py-4 rounded-full font-black text-lg transition-all transform hover:scale-105 active:scale-95 shadow-2xl"
           >
-            Start Over
+            ✨ Start Over
           </button>
         ) : (
           <button
@@ -110,7 +128,7 @@ export const WrappedViewer = ({ username, stats, onReset }: WrappedViewerProps) 
               e.stopPropagation();
               nextSlide();
             }}
-            className="bg-white/20 backdrop-blur hover:bg-white/30 text-white px-6 py-3 rounded-full font-semibold transition-colors"
+            className="bg-white/20 backdrop-blur-lg hover:bg-white/30 text-white px-8 py-4 rounded-full font-bold transition-all transform hover:scale-105 active:scale-95 shadow-xl border border-white/30"
           >
             Next →
           </button>
@@ -118,9 +136,16 @@ export const WrappedViewer = ({ username, stats, onReset }: WrappedViewerProps) 
       </div>
 
       {/* Slide Counter */}
-      <div className="absolute bottom-8 right-8 text-white/50 text-sm">
+      <div className="absolute bottom-8 right-8 text-white/60 text-sm font-bold z-20 pointer-events-none bg-black/20 backdrop-blur px-4 py-2 rounded-full">
         {currentSlide + 1} / {slides.length}
       </div>
+
+      {/* Click hint (only on first slide) */}
+      {currentSlide === 0 && (
+        <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 text-white/50 text-sm animate-pulse pointer-events-none z-10">
+          👆 Tap anywhere to continue
+        </div>
+      )}
     </div>
   );
 };

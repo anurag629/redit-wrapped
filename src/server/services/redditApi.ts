@@ -52,30 +52,32 @@ export async function fetchUserPosts(
   username: string,
   limit = 100
 ): Promise<RedditPost[]> {
-  const posts: RedditPost[] = [];
-
   try {
-    const listing = await reddit.getPostsByUser({
+    console.log(`Fetching up to ${limit} posts for user: ${username}`);
+
+    const listing = reddit.getPostsByUser({
       username,
       limit,
       sort: 'new',
+      pageSize: Math.min(limit, 100),
     });
 
-    for (const post of listing.children) {
-      posts.push({
-        id: post.id,
-        title: post.title,
-        subreddit: post.subredditName,
-        score: post.score,
-        num_comments: post.numberOfComments,
-        created_utc: post.createdAt.getTime() / 1000,
-        selftext: post.body || '',
-        url: post.url,
-        permalink: post.permalink,
-      });
+    // Fetch all posts from the listing
+    const redditPosts = await listing.all();
 
-      if (posts.length >= limit) break;
-    }
+    console.log(`Fetched ${redditPosts.length} posts`);
+
+    const posts: RedditPost[] = redditPosts.map((post) => ({
+      id: post.id,
+      title: post.title,
+      subreddit: post.subredditName,
+      score: post.score,
+      num_comments: post.numberOfComments,
+      created_utc: post.createdAt.getTime() / 1000,
+      selftext: post.body || '',
+      url: post.url,
+      permalink: post.permalink,
+    }));
 
     return posts;
   } catch (error) {
@@ -92,27 +94,29 @@ export async function fetchUserComments(
   username: string,
   limit = 100
 ): Promise<RedditComment[]> {
-  const comments: RedditComment[] = [];
-
   try {
-    const listing = await reddit.getCommentsByUser({
+    console.log(`Fetching up to ${limit} comments for user: ${username}`);
+
+    const listing = reddit.getCommentsByUser({
       username,
       limit,
       sort: 'new',
+      pageSize: Math.min(limit, 100),
     });
 
-    for (const comment of listing.children) {
-      comments.push({
-        id: comment.id,
-        body: comment.body || '',
-        subreddit: comment.subredditName,
-        score: comment.score,
-        created_utc: comment.createdAt.getTime() / 1000,
-        permalink: comment.permalink,
-      });
+    // Fetch all comments from the listing
+    const redditComments = await listing.all();
 
-      if (comments.length >= limit) break;
-    }
+    console.log(`Fetched ${redditComments.length} comments`);
+
+    const comments: RedditComment[] = redditComments.map((comment) => ({
+      id: comment.id,
+      body: comment.body || '',
+      subreddit: comment.subredditName,
+      score: comment.score,
+      created_utc: comment.createdAt.getTime() / 1000,
+      permalink: comment.permalink,
+    }));
 
     return comments;
   } catch (error) {
@@ -129,11 +133,17 @@ export async function fetchCompleteUserData(
   username: string,
   limit = 100
 ) {
+  console.log(`Starting data fetch for user: ${username}`);
+
   const [profile, posts, comments] = await Promise.all([
     fetchUserProfile(reddit, username),
     fetchUserPosts(reddit, username, limit),
     fetchUserComments(reddit, username, limit),
   ]);
+
+  console.log(
+    `Completed data fetch for ${username}: ${posts.length} posts, ${comments.length} comments`
+  );
 
   return { profile, posts, comments };
 }
