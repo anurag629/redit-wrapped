@@ -5,7 +5,6 @@
 ![License](https://img.shields.io/badge/license-BSD--3--Clause-green?style=for-the-badge)
 ![Status](https://img.shields.io/badge/status-In%20Review-yellow?style=for-the-badge)
 
-<div align="center">
 
 **Discover your Reddit story** ✨
 
@@ -13,7 +12,6 @@ An interactive web experience that analyzes your Reddit activity and presents it
 
 [View on Reddit Developers](https://developers.reddit.com/apps/redit-wrapped) • [Report Bug](https://github.com/anurag629/redit-wrapped/issues) • [Request Feature](https://github.com/anurag629/redit-wrapped/issues)
 
-</div>
 
 ---
 
