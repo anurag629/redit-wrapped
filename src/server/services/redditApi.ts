@@ -1,10 +1,5 @@
+import type { RedditAPIClient } from '@devvit/public-api';
 import type { RedditUser, RedditPost, RedditComment } from '../../shared/types/api';
-
-const REDDIT_BASE_URL = 'https://www.reddit.com';
-const USER_AGENT = 'RedditWrapped/1.0';
-
-// Rate limiting helper
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export class RedditApiError extends Error {
   constructor(
@@ -17,39 +12,28 @@ export class RedditApiError extends Error {
 }
 
 /**
- * Fetch user profile information
+ * Fetch user profile information using Devvit's Reddit API
  */
-export async function fetchUserProfile(username: string): Promise<RedditUser> {
+export async function fetchUserProfile(
+  reddit: RedditAPIClient,
+  username: string
+): Promise<RedditUser> {
   try {
-    const response = await fetch(`${REDDIT_BASE_URL}/user/${username}/about.json`, {
-      headers: {
-        'User-Agent': USER_AGENT,
-      },
-    });
+    const user = await reddit.getUserByUsername(username);
 
-    if (response.status === 404) {
+    if (!user) {
       throw new RedditApiError(`User "${username}" not found`, 'USER_NOT_FOUND');
     }
 
-    if (!response.ok) {
-      throw new RedditApiError(
-        `Failed to fetch user profile: ${response.statusText}`,
-        'FETCH_ERROR'
-      );
-    }
-
-    const data = (await response.json()) as { data: Record<string, unknown> };
-    const user = data.data;
-
     return {
-      name: user.name as string,
-      created_utc: user.created_utc as number,
-      link_karma: (user.link_karma as number) || 0,
-      comment_karma: (user.comment_karma as number) || 0,
-      total_karma: (user.total_karma as number) || 0,
-      is_gold: (user.is_gold as boolean) || false,
-      is_mod: (user.is_mod as boolean) || false,
-      verified: (user.verified as boolean) || false,
+      name: user.username,
+      created_utc: user.createdAt.getTime() / 1000,
+      link_karma: user.linkKarma || 0,
+      comment_karma: user.commentKarma || 0,
+      total_karma: (user.linkKarma || 0) + (user.commentKarma || 0),
+      is_gold: false, // Not available in Devvit API
+      is_mod: false, // Would need additional check
+      verified: false, // Not available in Devvit API
     };
   } catch (error) {
     if (error instanceof RedditApiError) {
@@ -61,63 +45,36 @@ export async function fetchUserProfile(username: string): Promise<RedditUser> {
 }
 
 /**
- * Fetch user posts with pagination
+ * Fetch user posts using Devvit's Reddit API
  */
 export async function fetchUserPosts(
+  reddit: RedditAPIClient,
   username: string,
   limit = 100
 ): Promise<RedditPost[]> {
   const posts: RedditPost[] = [];
-  let after: string | null = null;
-  const maxRequests = Math.ceil(limit / 100);
 
   try {
-    for (let i = 0; i < maxRequests; i++) {
-      const url = new URL(`${REDDIT_BASE_URL}/user/${username}/submitted.json`);
-      url.searchParams.set('limit', '100');
-      url.searchParams.set('raw_json', '1');
-      if (after) {
-        url.searchParams.set('after', after);
-      }
+    const listing = await reddit.getPostsByUser({
+      username,
+      limit,
+      sort: 'new',
+    });
 
-      const response = await fetch(url.toString(), {
-        headers: {
-          'User-Agent': USER_AGENT,
-        },
+    for (const post of listing.children) {
+      posts.push({
+        id: post.id,
+        title: post.title,
+        subreddit: post.subredditName,
+        score: post.score,
+        num_comments: post.numberOfComments,
+        created_utc: post.createdAt.getTime() / 1000,
+        selftext: post.body || '',
+        url: post.url,
+        permalink: post.permalink,
       });
 
-      if (!response.ok) {
-        console.error(`Failed to fetch posts: ${response.statusText}`);
-        break;
-      }
-
-      const data = (await response.json()) as {
-        data: { children: { data: Record<string, unknown> }[]; after: string | null };
-      };
-      const children = data.data.children || [];
-
-      for (const child of children) {
-        const post = child.data;
-        posts.push({
-          id: post.id as string,
-          title: post.title as string,
-          subreddit: post.subreddit as string,
-          score: post.score as number,
-          num_comments: post.num_comments as number,
-          created_utc: post.created_utc as number,
-          selftext: (post.selftext as string) || '',
-          url: post.url as string,
-          permalink: post.permalink as string,
-        });
-
-        if (posts.length >= limit) break;
-      }
-
-      after = data.data.after;
-      if (!after || posts.length >= limit) break;
-
-      // Rate limiting: wait 1 second between requests
-      await delay(1000);
+      if (posts.length >= limit) break;
     }
 
     return posts;
@@ -128,60 +85,33 @@ export async function fetchUserPosts(
 }
 
 /**
- * Fetch user comments with pagination
+ * Fetch user comments using Devvit's Reddit API
  */
 export async function fetchUserComments(
+  reddit: RedditAPIClient,
   username: string,
   limit = 100
 ): Promise<RedditComment[]> {
   const comments: RedditComment[] = [];
-  let after: string | null = null;
-  const maxRequests = Math.ceil(limit / 100);
 
   try {
-    for (let i = 0; i < maxRequests; i++) {
-      const url = new URL(`${REDDIT_BASE_URL}/user/${username}/comments.json`);
-      url.searchParams.set('limit', '100');
-      url.searchParams.set('raw_json', '1');
-      if (after) {
-        url.searchParams.set('after', after);
-      }
+    const listing = await reddit.getCommentsByUser({
+      username,
+      limit,
+      sort: 'new',
+    });
 
-      const response = await fetch(url.toString(), {
-        headers: {
-          'User-Agent': USER_AGENT,
-        },
+    for (const comment of listing.children) {
+      comments.push({
+        id: comment.id,
+        body: comment.body || '',
+        subreddit: comment.subredditName,
+        score: comment.score,
+        created_utc: comment.createdAt.getTime() / 1000,
+        permalink: comment.permalink,
       });
 
-      if (!response.ok) {
-        console.error(`Failed to fetch comments: ${response.statusText}`);
-        break;
-      }
-
-      const data = (await response.json()) as {
-        data: { children: { data: Record<string, unknown> }[]; after: string | null };
-      };
-      const children = data.data.children || [];
-
-      for (const child of children) {
-        const comment = child.data;
-        comments.push({
-          id: comment.id as string,
-          body: (comment.body as string) || '',
-          subreddit: comment.subreddit as string,
-          score: comment.score as number,
-          created_utc: comment.created_utc as number,
-          permalink: comment.permalink as string,
-        });
-
-        if (comments.length >= limit) break;
-      }
-
-      after = data.data.after;
-      if (!after || comments.length >= limit) break;
-
-      // Rate limiting: wait 1 second between requests
-      await delay(1000);
+      if (comments.length >= limit) break;
     }
 
     return comments;
@@ -194,11 +124,15 @@ export async function fetchUserComments(
 /**
  * Fetch complete user data (profile, posts, comments)
  */
-export async function fetchCompleteUserData(username: string, limit = 100) {
+export async function fetchCompleteUserData(
+  reddit: RedditAPIClient,
+  username: string,
+  limit = 100
+) {
   const [profile, posts, comments] = await Promise.all([
-    fetchUserProfile(username),
-    fetchUserPosts(username, limit),
-    fetchUserComments(username, limit),
+    fetchUserProfile(reddit, username),
+    fetchUserPosts(reddit, username, limit),
+    fetchUserComments(reddit, username, limit),
   ]);
 
   return { profile, posts, comments };
